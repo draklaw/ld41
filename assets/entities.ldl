@@ -1,0 +1,98 @@
+__models__ = {
+	enabled = false
+	children = {
+	}
+}
+
+scene = {
+	transform = translate(0, 0, 0)
+
+	children = {
+		fp_view = {
+			transform = [ translate(0, 480, 0), scale(960, 600) ]
+			sprite = {
+				texture = Texture(sprite_color, 'white.png', Sampler('bilinear_no_mipmap|clamp'))
+				tile_grid = Vector(1, 1)
+				tile_index = 0
+				anchor = Vector(0, 0)
+				color = Vector(128, 96, 32)
+				blend = none
+			}
+		}
+		map = {
+			transform = translate(0, 0, 0)
+			sprite = {
+				texture = Texture(sprite_color, 'map.png', Sampler('bilinear_no_mipmap|clamp'))
+				tile_grid = Vector(1, 1)
+				tile_index = 0
+				anchor = Vector(0, 0)
+				blend = none
+			}
+		}
+		stats_area = {
+			transform = translate(480, 0, 0)
+
+			children = {
+				stats_bg = {
+					transform = [ translate(0, 0, 0), scale(480, 480) ]
+					sprite = {
+						texture = Texture(sprite_color, 'white.png', Sampler('bilinear_no_mipmap|clamp'))
+						tile_grid = Vector(1, 1)
+						tile_index = 0
+						anchor = Vector(0, 0)
+						color = Vector(0, .2, 0)
+						blend = none
+					}
+				}
+				stats_text = {
+					transform = translate(16, 464, 0.1)
+					text = {
+						font = 'anonymous_pro_28.json'
+						text = 'Mage lvl 4\nHP: 100 / 100\nMana: 20/60\n'
+						size = Vector(448, 448)
+						color = Vector(.8, .8, .8)
+						anchor = Vector(0, 1)
+						blend = alpha
+					}
+				}
+			}
+		}
+		text_area = {
+			transform = translate(960, 0, 0)
+
+			children = {
+				text_bg = {
+					transform = [ translate(0, 0, 0), scale(960, 1080) ]
+					sprite = {
+						texture = Texture(sprite_color, 'white.png', Sampler('bilinear_no_mipmap|clamp'))
+						tile_grid = Vector(1, 1)
+						tile_index = 0
+						anchor = Vector(0, 0)
+						color = Vector(0, 0, .2)
+						blend = none
+					}
+				}
+				text = {
+					transform = translate(16, 16, 0.1)
+					text = {
+						font = 'anonymous_pro_28.json'
+						text = '''Quasi et quis nulla qui maxime asperiores quas. Sit aut quia quaerat sapiente in amet. Tempora dolorum similique ut rerum recusandae adipisci vel. Quos temporibus qui accusantium quo numquam veniam ut exercitationem. Dolorem non architecto sed amet. Sed ratione quia ab blanditiis est eius qui maiores.
+
+Omnis officiis voluptatem qui. Nobis ratione eius dolores. Quod quas animi ut tempora sint nisi. Est nam consequuntur illo aut. Alias et quia repudiandae blanditiis. Adipisci sed consequatur delectus accusamus est eveniet.
+
+Ex iste non dolorem quia suscipit laborum pariatur nulla. Est perferendis reiciendis nostrum est laborum blanditiis soluta. Eveniet veritatis sed itaque iste. Illo quis cum laudantium repudiandae accusamus.
+
+Nesciunt libero sint cum eveniet. Assumenda velit quasi alias fugit ullam. Perferendis autem dolor molestiae occaecati. Culpa tempora vel optio dolorem officiis rerum error voluptatibus. Ullam ut ratione numquam.
+
+Autem qui et minus exercitationem est at nihil voluptates. Aut corporis quam voluptatem ducimus ex. Quia praesentium ut alias recusandae et est ratione. Id eum at dolorum aut voluptas et nobis consequatur. Voluptatem saepe placeat consequatur aperiam nesciunt et illum.
+'''
+						size = Vector(928, 1048)
+						color = Vector(.8, .8, .8)
+						anchor = Vector(0, 0)
+						blend = alpha
+					}
+				}
+			}
+		}
+	}
+}
