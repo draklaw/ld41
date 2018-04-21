@@ -1,7 +1,7 @@
 /*
- *  Copyright (C) 2015, 2017 the authors (see AUTHORS)
+ *  Copyright (C) 2015, 2018 the authors (see AUTHORS)
  *
- *  This file is part of Draklia's ld39.
+ *  This file is part of Draklia's ld41.
  *
  *  lair is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef LD39_SPLASH_STATE_H_
-#define LD39_SPLASH_STATE_H_
+#ifndef LD41_SPLASH_STATE_H_
+#define LD41_SPLASH_STATE_H_
 
 
 #include <deque>

@@ -1,7 +1,7 @@
 /*
- *  Copyright (C) 2017 the authors (see AUTHORS)
+ *  Copyright (C) 2017-2018 the authors (see AUTHORS)
  *
- *  This file is part of Kitten Keeper.
+ *  This file is part of ld41.
  *
  *  Kitten Keeper is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
