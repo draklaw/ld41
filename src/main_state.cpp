@@ -341,8 +341,6 @@ void MainState::keyDown(unsigned scancode, unsigned /*keycode*/, uint16 /*mod*/,
 	case SDL_SCANCODE_RIGHT:
 		_console.moveCursor(1);
 		break;
-	default:
-		log().warning("Unused key press: ", scancode);
 	}
 }
 
