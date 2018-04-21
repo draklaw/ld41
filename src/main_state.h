@@ -40,6 +40,8 @@
 #include <lair/ec/bitmap_text_component.h>
 #include <lair/ec/tile_layer_component.h>
 
+#include "console.h"
+
 
 using namespace lair;
 
@@ -93,6 +95,13 @@ public:
 	EntityRef getEntity(const String& name, const EntityRef& ancestor = EntityRef());
 
 	void startGame();
+	void stopGame();
+
+	void keyDown(unsigned scancode, unsigned keycode, uint16 mod,
+	             bool pressed, bool repeat);
+	void keyUp(unsigned scancode, unsigned keycode, uint16 mod,
+	           bool pressed, bool repeat);
+
 	void updateTick();
 	void updateFrame();
 
@@ -116,6 +125,9 @@ public:
 	TileLayerComponentManager  _tileLayers;
 
 	InputManager               _inputs;
+
+	Console     _console;
+	ConsoleView _consoleView;
 
 	SlotTracker _slotTracker;
 
@@ -144,6 +156,7 @@ public:
 	EntityRef   _map;
 	EntityRef   _statsText;
 	EntityRef   _text;
+	EntityRef   _cursor;
 };
 
 

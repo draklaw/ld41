@@ -60,6 +60,9 @@ MainState::MainState(Game* game)
 
       _inputs(sys(), &log()),
 
+      _console(),
+      _consoleView(&_console, 60),
+
       _camera(),
 
       _initialized(false),
@@ -87,6 +90,8 @@ MainState::~MainState() {
 
 
 void MainState::initialize() {
+	using namespace std::placeholders;
+
 	srand(time(nullptr));
 
 	_loop.reset();
@@ -98,6 +103,10 @@ void MainState::initialize() {
 
 	window()->onResize.connect(std::bind(&MainState::resizeEvent, this))
 	        .track(_slotTracker);
+
+	game()->sys()->onKeyDown   = std::bind(&MainState::keyDown, this, _1, _2, _3, _4, _5);
+	game()->sys()->onKeyUp     = std::bind(&MainState::keyUp,   this, _1, _2, _3, _4, _5);
+	game()->sys()->onTextInput = std::bind(&Console::inputText, &_console, _1);
 
 	_quitInput  = _inputs.addInput("quit");
 	_leftInput  = _inputs.addInput("left");
@@ -117,8 +126,13 @@ void MainState::initialize() {
 
 	loadEntities("entities.ldl", _entities.root());
 
-	_models       = _entities.findByName("__models__");
+	_models      = _entities.findByName("__models__");
 	_scene       = _entities.findByName("scene");
+	_view        = _entities.findByName("fp_view");
+	_map         = _entities.findByName("map");
+	_statsText   = _entities.findByName("stats_text");
+	_text        = _entities.findByName("text");
+	_cursor      = _entities.findByName("cursor");
 
 //	loadSound("kittendeath.wav");
 
@@ -164,6 +178,8 @@ void MainState::run() {
 		}
 	} while (_running);
 	_loop.stop();
+
+	stopGame();
 }
 
 
@@ -297,8 +313,42 @@ EntityRef MainState::getEntity(const String& name, const EntityRef& ancestor) {
 
 
 void MainState::startGame() {
+	game()->sys()->startTextInput();
 	//audio()->playMusic(assets()->getAsset("music.ogg"));
 	//audio()->playSound(assets()->getAsset("sound.ogg"), 2);
+}
+
+
+void MainState::stopGame() {
+	game()->sys()->stopTextInput();
+}
+
+
+void MainState::keyDown(unsigned scancode, unsigned /*keycode*/, uint16 /*mod*/,
+                        bool /*pressed*/, bool /*repeat*/) {
+	switch(scancode) {
+	case SDL_SCANCODE_RETURN:
+	case SDL_SCANCODE_RETURN2:
+	case SDL_SCANCODE_KP_ENTER:
+		_console.execLine();
+		break;
+	case SDL_SCANCODE_BACKSPACE:
+		_console.backspace();
+		break;
+	case SDL_SCANCODE_LEFT:
+		_console.moveCursor(-1);
+		break;
+	case SDL_SCANCODE_RIGHT:
+		_console.moveCursor(1);
+		break;
+	default:
+		log().warning("Unused key press: ", scancode);
+	}
+}
+
+
+void MainState::keyUp(unsigned /*scancode*/, unsigned /*keycode*/, uint16 /*mod*/,
+                      bool /*pressed*/, bool /*repeat*/) {
 }
 
 
@@ -319,6 +369,26 @@ void MainState::updateTick() {
 
 
 void MainState::updateFrame() {
+	// Update
+
+	BitmapTextComponent* text = _texts.get(_text);
+	if(text) {
+		Vector2i cursor(-1, -1);
+		text->setText(_consoleView.text(36, -1, &cursor));
+
+		const BitmapFont& font = text->font()->get();
+
+		Vector3 pos(
+		    cursor(0) * font.glyph('m').advance,
+		    -cursor(1) * font.height() + 1020,
+		    0.1
+		);
+		_cursor.setEnabled(cursor(0) >= 0);
+		_cursor.placeAt(pos);
+		_cursor.computeWorldTransform();
+	}
+
+
 	// Rendering
 	Context* glc = renderer()->context();
 
