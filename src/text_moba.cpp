@@ -221,6 +221,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_addCommand<DirectionsCommand>();
 	_addCommand<WaitCommand>();
 	_addCommand<GoCommand>();
+	_addCommand<MoveCommand>();
 	_addCommand<AttackCommand>();
 }
 
@@ -368,6 +369,15 @@ void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 	if(dest) {
 		dest->addCharacter(character);
 	}
+}
+
+
+void TextMoba::placeCharacter(CharacterSP character, Place place) {
+//	if(player() && character != player() && player()->isAlive()
+//	        && character->node() == player()->node()) {
+	    print(character->name(), " moves to the ", placeName(place), " row.");
+//	}
+	character->_place = place;
 }
 
 

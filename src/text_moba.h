@@ -119,6 +119,7 @@ public:
 	void killCharacter(CharacterSP character);
 
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
+	void placeCharacter(CharacterSP character, Place place);
 	void nextTurn();
 
 	const TMCommandList& commands() const;

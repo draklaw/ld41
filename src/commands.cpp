@@ -202,6 +202,41 @@ void GoCommand::exec(const StringVector& args) {
 
 
 
+MoveCommand::MoveCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+{
+	_names.emplace_back("move");
+	_names.emplace_back("m");
+
+	_desc = "  Take \"front\" or \"back\" in parameter. Move your\n"
+	        "  character to the front/back row.";
+}
+
+void MoveCommand::exec(const StringVector& args) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
+	if(args.size() != 2 || (args[1] != "front" && args[1] != "back")) {
+		print("I don't understand where you want to go. Type");
+		print("  ", args[0], " [front|back]");
+	}
+	else {
+		Place place = Place((args[1] == "front")? FRONT: BACK);
+		if(place == player()->place()) {
+			print("You already are at the ", args[1], " row.");
+			return;
+		}
+		else {
+			tm()->placeCharacter(player(), place);
+			tm()->nextTurn();
+		}
+	}
+}
+
+
+
 AttackCommand::AttackCommand(TextMoba* textMoba)
     : TMCommand(textMoba)
 {
