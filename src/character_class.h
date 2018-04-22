@@ -19,27 +19,28 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
+#ifndef LD41_CHARACTER_CLASS_H_
+#define LD41_CHARACTER_CLASS_H_
 
 
 #include <lair/core/lair.h>
 
-#include "tm_command.h"
+#include "text_moba.h"
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+class CharacterClass {
+public:
+	lair::String id;
+	lair::String name;
+	bool         playable;
 
-
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(GoCommand)
+	IntVector    maxHP;
+	IntVector    maxMana;
+	IntVector    xp;
+	IntVector    damage;
+	IntVector    range;
+	IntVector    speed;
+};
 
 
 #endif

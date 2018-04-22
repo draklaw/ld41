@@ -19,27 +19,37 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
+#ifndef LD41_MAP_NODE_H_
+#define LD41_MAP_NODE_H_
 
 
 #include <lair/core/lair.h>
 
-#include "tm_command.h"
+#include "text_moba.h"
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+class MapNode : public std::enable_shared_from_this<MapNode> {
+public:
+	typedef std::unordered_map<MapNode*, StringVector> NodeMap;
+	typedef std::unordered_set<CharacterSP>            CharacterSet;
 
+public:
+	MapNodeSP destination(const lair::String& direction) const;
 
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(GoCommand)
+	void addCharacter(CharacterSP character);
+	void removeCharacter(CharacterSP character);
+
+public:
+	lair::String  id;
+	lair::String  name;
+	NodeMap       paths;
+	lair::Path    image;
+	lair::Vector2 pos;
+	lair::String  tower;
+	lair::String  fonxus;
+
+	CharacterSet  characters;
+};
 
 
 #endif

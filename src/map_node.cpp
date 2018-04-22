@@ -19,27 +19,34 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
+#include <lair/core/log.h>
+
+#include "character_class.h"
+#include "character.h"
+
+#include "map_node.h"
 
 
-#include <lair/core/lair.h>
-
-#include "tm_command.h"
+using namespace lair;
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+MapNodeSP MapNode::destination(const String& direction) const {
+	for(const auto& pair: paths) {
+		for(const String& dir: pair.second) {
+			if(dir == direction) {
+				return pair.first->shared_from_this();
+			}
+		}
+	}
+	return MapNodeSP();
+}
 
 
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(GoCommand)
+void MapNode::addCharacter(CharacterSP character) {
+	characters.emplace(character);
+}
 
 
-#endif
+void MapNode::removeCharacter(CharacterSP character) {
+	characters.erase(character);
+}

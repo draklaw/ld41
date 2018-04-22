@@ -26,51 +26,111 @@
 #include "console.h"
 #include "commands.h"
 
+#include "map_node.h"
+#include "character_class.h"
+#include "character.h"
+#include "tm_command.h"
+
 #include "text_moba.h"
 
 
 using namespace lair;
 
 
-MapNode* MapNode::destination(const String& direction) const {
-	for(const auto& pair: paths) {
-		for(const String& dir: pair.second) {
-			if(dir == direction) {
-				return pair.first;
-			}
+// TODO: Move this to Lair
+
+
+const Variant& getVarItem(const Variant& var, const String& key, bool* success = nullptr) {
+	if(!var.isVarMap()) {
+		dbgLogger.error("Expected VarMap for key \"", key, "\", got \"", var.type()->identifier, "\".");
+		if(success)
+			*success = false;
+		return Variant::null;
+	}
+
+	return var.get(key);
+}
+
+bool getBool(const Variant& var, const String& key, bool defaultValue = false, bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	if(v.isBool()) {
+		return v.asBool();
+	}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected Bool for key \"", key, "\", got \"", var.type()->identifier, "\".");
+		if(success)
+			*success = false;
+	}
+
+	return defaultValue;
+}
+
+int64 getInt(const Variant& var, const String& key, int64 defaultValue = 0, bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	if(v.isInt()) {
+		return v.asInt();
+	}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected Int for key \"", key, "\", got \"", var.type()->identifier, "\".");
+		if(success)
+			*success = false;
+	}
+
+	return defaultValue;
+}
+
+float getFloat(const Variant& var, const String& key, float defaultValue = 0, bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	if(v.isFloat()) {
+		return v.asFloat();
+	}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected Float for key \"", key, "\", got \"", var.type()->identifier, "\".");
+		if(success)
+			*success = false;
+	}
+
+	return defaultValue;
+}
+
+const String& getString(const Variant& var, const String& key, const String& defaultValue = String(), bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	if(v.isString()) {
+		return v.asString();
+	}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected String for key \"", key, "\", got \"", var.type()->identifier, "\".");
+		if(success)
+			*success = false;
+	}
+
+	return defaultValue;
+}
+
+IntVector getClassStats(const Variant& var, const String& key, bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	if(v.isInt()) {
+		return IntVector(6, v.asInt());
+	}
+	if(v.isVarList()) {
+		IntVector stats(6, 0);
+		unsigned i = 0;
+		for(const Variant& v2: v.asVarList()) {
+			stats[i] = v2.asInt();
 		}
 	}
-	return nullptr;
-}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected String.");
+		if(success)
+			*success = false;
+	}
 
-
-
-TMCommand::TMCommand(TextMoba* textMoba)
-    : _textMoba(textMoba)
-{
-}
-
-
-TMCommand::~TMCommand() {
-}
-
-const StringVector& TMCommand::names() const {
-	return _names;
-}
-
-
-const lair::String& TMCommand::desc() const {
-	return _desc;
-}
-
-
-TextMoba* TMCommand::tm() {
-	return _textMoba;
-}
-
-
-Character* TMCommand::player() {
-	return _textMoba->player();
+	return IntVector(6, 0);
 }
 
 
@@ -118,21 +178,35 @@ Console* TextMoba::console() {
 }
 
 
-MapNode* TextMoba::mapNode(const String& id) {
+MapNodeSP TextMoba::mapNode(const String& id) {
 	auto it = _nodes.find(id);
 	if(it == _nodes.end())
 		return nullptr;
-	return it->second.get();
+	return it->second;
 }
 
 
-Character* TextMoba::player() {
-	return _player.get();
+CharacterClassSP TextMoba::characterClass(const lair::String& id) {
+	auto it = _classes.find(id);
+	if(it == _classes.end())
+		return nullptr;
+	return it->second;
 }
 
 
-void TextMoba::moveCharacter(Character* character, MapNode* dest) {
-	character->position = dest;
+CharacterSP TextMoba::player() {
+	return _player;
+}
+
+
+void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
+	if(character->node()) {
+		character->node()->removeCharacter(character);
+	}
+	character->_node = dest;
+	if(dest) {
+		dest->addCharacter(character);
+	}
 }
 
 
@@ -249,6 +323,9 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			else
 				dbgLogger.error("Node without position");
 
+			node->tower  = getString(obj, "tower");
+			node->fonxus = getString(obj, "fonxus");
+
 			_nodes.emplace(node->id, node);
 		}
 	}
@@ -265,13 +342,13 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			const Variant& toDirsVar   = path.get("to_dirs");
 			if(fromVar.isString() && toVar.isString() &&
 			        fromDirsVar.isVarList() && toDirsVar.isVarList()) {
-				MapNode* from = mapNode(fromVar.asString());
-				MapNode* to   = mapNode(toVar.asString());
+				MapNodeSP from = mapNode(fromVar.asString());
+				MapNodeSP to   = mapNode(toVar.asString());
 
 				StringVector& fromDirs =
-				        from->paths.emplace(to,   StringVector()).first->second;
+				        from->paths.emplace(to.get(),   StringVector()).first->second;
 				StringVector& toDirs =
-				        to  ->paths.emplace(from, StringVector()).first->second;
+				        to  ->paths.emplace(from.get(), StringVector()).first->second;
 
 				for(const Variant& dirVar: fromDirsVar.asVarList()) {
 					if(dirVar.isString()) {
@@ -294,9 +371,45 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		dbgLogger.error("Expected \"paths\" VarList.");
 	}
 
-	_player = std::make_shared<Character>();
+	Variant classes = config.get("classes");
+	if(classes.isVarMap()) {
+		for(const auto& pair: classes.asVarMap()) {
+			const String& id = pair.first;
+			const Variant& obj = pair.second;
 
-	_player->position = mapNode("bf");
+			CharacterClassSP cClass = std::make_shared<CharacterClass>();
 
+			cClass->id       = id;
+			cClass->name     = getString(obj, "name", "<fixme_no_name>");
+			cClass->playable = getBool(obj, "playable", false);
+			cClass->maxHP    = getClassStats(obj, "max_hp");
+			cClass->maxMana  = getClassStats(obj, "max_mana");
+			cClass->xp       = getClassStats(obj, "xp");
+			cClass->damage   = getClassStats(obj, "damage");
+			cClass->range    = getClassStats(obj, "range");
+			cClass->speed    = getClassStats(obj, "speed");
+
+			_classes.emplace(cClass->id, cClass);
+		}
+	}
+	else {
+		dbgLogger.error("Expected \"classes\" VarMap.");
+	}
+
+	_player = std::make_shared<Character>(characterClass("warrior"));
+	_player->_team = BLUE;
+	moveCharacter(_player, mapNode("bf"));
+
+	for(const auto& pair: _nodes) {
+		MapNodeSP node = pair.second;
+
+		if(node->tower.size()) {
+			CharacterSP tower = std::make_shared<Character>(characterClass("tower"));
+			tower->_team = (node->tower == "blue")? BLUE: RED;
+			moveCharacter(tower, node);
+		}
+	}
+
+	// Starts the game with a description of the environement
 	_execCommand("look");
 }

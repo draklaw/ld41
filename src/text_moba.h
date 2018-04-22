@@ -25,6 +25,7 @@
 
 #include <utility>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <lair/core/lair.h>
 #include <lair/core/path.h>
@@ -38,83 +39,33 @@ class Console;
 
 
 enum Team {
-	TEAM_BLUE,
-	TEAM_RED,
+	BLUE,
+	RED,
+	NEUTRAL,
+};
+
+enum Place {
+	BACK,
+	FRONT,
 };
 
 
+class MapNode;
+class CharacterClass;
+class Character;
+class TextMoba;
+class TMCommand;
+
+typedef std::shared_ptr<MapNode>        MapNodeSP;
+typedef std::weak_ptr<MapNode>          MapNodeWP;
+typedef std::shared_ptr<CharacterClass> CharacterClassSP;
+typedef std::shared_ptr<Character>      CharacterSP;
+typedef std::shared_ptr<TMCommand>      TMCommandSP;
+
+
+typedef std::vector<int>          IntVector;
 typedef std::vector<lair::String> StringVector;
 
-
-class MapNode {
-public:
-	typedef std::unordered_map<MapNode*, StringVector> NodeMap;
-
-public:
-	MapNode* destination(const lair::String& direction) const;
-
-public:
-	lair::String  id;
-	lair::String  name;
-	NodeMap       paths;
-	lair::Path    image;
-	lair::Vector2 pos;
-};
-
-typedef std::shared_ptr<MapNode> MapNodeSP;
-
-
-class Character {
-public:
-	enum Status {
-		ALIVE,
-		DEAD,
-	};
-
-public:
-	MapNode* position;
-	Team     team;
-
-	unsigned maxHP;
-	unsigned maxMana;
-
-	unsigned level;
-	unsigned xp;
-
-	unsigned hp;
-	unsigned mana;
-
-	unsigned deathTime;
-};
-
-typedef std::shared_ptr<Character> CharacterSP;
-
-
-class TextMoba;
-
-class TMCommand {
-public:
-	TMCommand(TextMoba* textMoba);
-	virtual ~TMCommand();
-
-	const StringVector& names() const;
-	const lair::String& desc() const;
-
-	virtual void exec(const StringVector& args) = 0;
-
-	template<typename... Args>
-	inline void print(Args&&... args) const;
-
-	TextMoba* tm();
-	Character* player();
-
-protected:
-	TextMoba*    _textMoba;
-	StringVector   _names;
-	lair::String _desc;
-};
-
-typedef std::shared_ptr<TMCommand> TMCommandSP;
 
 
 class TextMoba {
@@ -129,10 +80,11 @@ public:
 	MainState* mainState();
 	Console* console();
 
-	MapNode* mapNode(const lair::String& id);
-	Character* player();
+	MapNodeSP mapNode(const lair::String& id);
+	CharacterClassSP characterClass(const lair::String& id);
+	CharacterSP player();
 
-	void moveCharacter(Character* character, MapNode* dest);
+	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void nextTurn();
 
 	const TMCommandList& commands() const;
@@ -148,8 +100,9 @@ public:
 	bool _execCommand(const lair::String& command);
 
 private:
-	typedef std::unordered_map<lair::String, MapNodeSP>  NodeMap;
-	typedef std::unordered_map<lair::String, TMCommand*> TMCommandMap;
+	typedef std::unordered_map<lair::String, MapNodeSP>        NodeMap;
+	typedef std::unordered_map<lair::String, TMCommand*>       TMCommandMap;
+	typedef std::unordered_map<lair::String, CharacterClassSP> ClassMap;
 
 private:
 	void _initialize(std::istream& in, const lair::Path& logicPath);
@@ -162,14 +115,9 @@ private:
 	TMCommandMap  _commandMap;
 
 	NodeMap     _nodes;
+	ClassMap    _classes;
 	CharacterSP _player;
 };
-
-
-template<typename... Args>
-inline void TMCommand::print(Args&&... args) const {
-	_textMoba->console()->writeLine(lair::cat(std::forward<Args>(args)...));
-}
 
 
 #endif

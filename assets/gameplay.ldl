@@ -13,11 +13,14 @@ nodes = {
 		name = "the blue fonxus"
 		image = 'fonxus.png'
 		position = Vector(30, 450)
+		tower = blue
+		fonxus = blue
 	}
 	btt1 = {
 		name = "the blue top 1st tower"
 		image = 'base_tower.png'
 		position = Vector(35, 358)
+		tower = blue
 	}
 	btl1 = {
 		name = "the top lane between the blue 1st and 2nd tower"
@@ -28,11 +31,13 @@ nodes = {
 		name = "the blue top 2nd tower"
 		image = 'lane_tower.png'
 		position = Vector(35, 358)
+		tower = blue
 	}
 	bbt1 = {
 		name = "the blue bottom 1st tower"
 		image = 'base_tower.png'
 		position = Vector(35, 358)
+		tower = blue
 	}
 	bbl1 = {
 		name = "the bottom lane between the blue 1st and 2nd tower"
@@ -43,6 +48,7 @@ nodes = {
 		name = "the blue bottom 2nd tower"
 		image = 'lane_tower.png'
 		position = Vector(35, 358)
+		tower = blue
 	}
 	bj1 = {
 		name = "the jungle near the 1st blue tower"
@@ -60,11 +66,14 @@ nodes = {
 		name = "the red fonxus"
 		image = 'fonxus.png'
 		position = Vector(30, 450)
+		tower = red
+		fonxus = red
 	}
 	rtt1 = {
 		name = "the red top 1st tower"
 		image = 'base_tower.png'
 		position = Vector(35, 358)
+		tower = red
 	}
 	rtl1 = {
 		name = "the top lane between the red 1st and 2nd tower"
@@ -75,11 +84,13 @@ nodes = {
 		name = "the red top 2nd tower"
 		image = 'lane_tower.png'
 		position = Vector(35, 358)
+		tower = red
 	}
 	rbt1 = {
 		name = "the red bottom 1st tower"
 		image = 'base_tower.png'
 		position = Vector(35, 358)
+		tower = red
 	}
 	rbl1 = {
 		name = "the bottom lane between the red 1st and 2nd tower"
@@ -90,6 +101,7 @@ nodes = {
 		name = "the red bottom 2nd tower"
 		image = 'lane_tower.png'
 		position = Vector(35, 358)
+		tower = red
 	}
 	rj1 = {
 		name = "the jungle near the 1st red tower"
@@ -331,3 +343,26 @@ paths = [
 		to_dirs   = [ "red" ]
 	}
 ]
+
+classes = {
+	// Each character has 6 levels.
+	warrior = {
+		name     = "warrior"
+		playable = true
+		max_hp   = [  120,  160,  200,  240,  280,  320 ]
+		max_mana = [   20,   25,   30,   35,   40,   45 ]
+		xp       = [ 1000, 2000, 3000, 4000, 5000, 6000 ]
+		damage   = [   20,   25,   30,   35,   40,   45 ]
+		range    = 1
+		speed    = 3
+	}
+
+	// Towers gain level with time.
+	tower = {
+		name     = "tower"
+		max_hp   = 1000
+		damage   = [ 40, 50, 60, 70, 80, 90 ]
+		range    = 2
+		speed    = 0
+	}
+}

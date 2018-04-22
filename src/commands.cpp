@@ -24,6 +24,11 @@
 #include <lair/core/log.h>
 #include <lair/core/text.h>
 
+#include "map_node.h"
+#include "character_class.h"
+#include "character.h"
+#include "text_moba.h"
+
 #include "commands.h"
 
 
@@ -88,13 +93,30 @@ LookCommand::LookCommand(TextMoba* textMoba)
 	_names.emplace_back("l");
 
 	_desc = "  Look around you. Describe the place and what / who is\n"
-	        "  here.With a parameter, look at a specific object here.\n"
+	        "  here. With a parameter, look at a specific object here.\n"
 	        "  Example: look tower (describe a tower)";
 }
 
 void LookCommand::exec(const StringVector& args) {
 	if(args.size() == 1) {
-		print("You are at ", player()->position->name, ".");
+		MapNodeSP node = player()->node();
+		print("You are at ", node->name, ".");
+
+		if(node->characters.size() < 2) {
+			print("There is nothing here.");
+		}
+		else {
+			print("Here, there is");
+			unsigned i = 0;
+			for(CharacterSP c: node->characters) {
+				if(c == player())
+					continue;
+				i += 1;
+				print("  ", i, ": a level ", c->level() + 1, " ",
+				      c->teamName(), " ", c->className(), " (",
+				      c->hp(), " / ", c->maxHP(), ")");
+			}
+		}
 	}
 }
 
@@ -111,7 +133,7 @@ DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
 
 void DirectionsCommand::exec(const StringVector& /*args*/) {
 	print("From here, you can go toward:");
-	for(const auto& pair: player()->position->paths) {
+	for(const auto& pair: player()->node()->paths) {
 		print("  ", join(pair.second), ": toward ", pair.first->name);
 	}
 }
@@ -134,8 +156,8 @@ void GoCommand::exec(const StringVector& args) {
 	}
 	else {
 		String dir = toLower(args[1]);
-		MapNode* node = player()->position;
-		MapNode* dest = node->destination(dir);
+		MapNodeSP node = player()->node();
+		MapNodeSP dest = node->destination(dir);
 		if(dest) {
 			tm()->moveCharacter(player(), dest);
 			tm()->_execCommand("look");

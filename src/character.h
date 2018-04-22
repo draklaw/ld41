@@ -19,27 +19,50 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
+#ifndef LD41_CHARACTER_H_
+#define LD41_CHARACTER_H_
 
 
 #include <lair/core/lair.h>
 
-#include "tm_command.h"
+#include "text_moba.h"
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+class Character {
+public:
+	Character(CharacterClassSP cClass, unsigned level = 0);
 
+	CharacterClassSP cClass() const;
+	const lair::String& className() const;
 
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(GoCommand)
+	MapNodeSP node() const;
+
+	Team team() const;
+	const lair::String& teamName() const;
+
+	unsigned maxHP() const;
+	unsigned maxMana() const;
+	unsigned level() const;
+	unsigned xp() const;
+	unsigned hp() const;
+	unsigned mana() const;
+
+	bool isAlive() const;
+	bool deathTime() const;
+
+public:
+	CharacterClassSP _cClass;
+	MapNodeSP _node;
+	Team     _team;
+
+	unsigned _level;
+	unsigned _xp;
+
+	unsigned _hp;
+	unsigned _mana;
+
+	unsigned _deathTime;
+};
 
 
 #endif

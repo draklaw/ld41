@@ -19,27 +19,38 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
-
-
-#include <lair/core/lair.h>
+#include <lair/core/log.h>
 
 #include "tm_command.h"
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+using namespace lair;
 
 
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(GoCommand)
+TMCommand::TMCommand(TextMoba* textMoba)
+    : _textMoba(textMoba)
+{
+}
 
 
-#endif
+TMCommand::~TMCommand() {
+}
+
+const StringVector& TMCommand::names() const {
+	return _names;
+}
+
+
+const lair::String& TMCommand::desc() const {
+	return _desc;
+}
+
+
+TextMoba* TMCommand::tm() {
+	return _textMoba;
+}
+
+
+CharacterSP TMCommand::player() {
+	return _textMoba->player();
+}
