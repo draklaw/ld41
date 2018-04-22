@@ -38,7 +38,7 @@ public:
 
 	unsigned index() const;
 
-	lair::String name() const;
+	lair::String name(bool showIndex = true) const;
 	lair::String debugName() const;
 	lair::String shortDesc() const;
 

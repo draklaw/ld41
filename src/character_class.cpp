@@ -50,6 +50,11 @@ bool CharacterClass::playable() const {
 }
 
 
+bool CharacterClass::building() const {
+	return _building;
+}
+
+
 Place CharacterClass::defaultPlace() const {
 	return _defaultPlace;
 }

@@ -41,6 +41,7 @@ DECL_COMMAND(LookCommand)
 DECL_COMMAND(DirectionsCommand)
 DECL_COMMAND(WaitCommand)
 DECL_COMMAND(GoCommand)
+DECL_COMMAND(AttackCommand)
 
 
 #endif

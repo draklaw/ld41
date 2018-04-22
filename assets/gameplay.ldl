@@ -54,6 +54,7 @@ classes = {
 		range      = 2
 		speed      = 0
 		sort_index = 2
+		building   = true
 	}
 }
 

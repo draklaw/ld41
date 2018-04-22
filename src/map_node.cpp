@@ -122,7 +122,7 @@ unsigned CharacterGroups::distanceBetween(CharacterSP c0, CharacterSP c1) const 
 		std::swap(p0, p1);
 
 	unsigned dist = p1 - p0;
-	for(int i = p0 + 1; i < p0 - 1; ++i) {
+	for(int i = p0 + 1; i < p1; ++i) {
 		Team team = teamFromPlaceIndex(i);
 		Place place = placeFromPlaceIndex(i);
 		if(!count(team, place)) {
@@ -219,6 +219,18 @@ const String& MapNode::tower() const {
 
 const String& MapNode::fonxus() const {
 	return _fonxus;
+}
+
+
+CharacterSP MapNode::characterAt(unsigned index) const {
+	auto it  = _characters.begin();
+	auto end = _characters.end();
+	for(unsigned i = 0; it != end && i < index; ++i)
+		++it;
+
+	if(it == _characters.end())
+		return CharacterSP();
+	return *it;
 }
 
 

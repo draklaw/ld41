@@ -101,18 +101,24 @@ LookCommand::LookCommand(TextMoba* textMoba)
 }
 
 void LookCommand::exec(const StringVector& args) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
 	if(args.size() == 1) {
 		MapNodeSP node = player()->node();
 		print("You are at ", node->name(), ".");
 
 		print("Here, there is");
 		unsigned i = 0;
+		CharacterGroups groups = node->characterGroups();
 		for(CharacterSP c: node->characters()) {
-			print("  ", i, ": ", c->isPlayer()? "You: ": "",
-			      "[", c->placeName(),
-			      "] a level ", c->level() + 1, " ",
-			      c->teamName(), " ", c->className(), " (",
-			      c->hp(), " / ", c->maxHP(), ")");
+			print("  ", i, ": ",
+			      "[", c->placeName(), "] ", c->name(false), " (lvl ",
+			      c->level() + 1, ", ", c->hp(), " / ", c->maxHP(), ")",
+			      " dist: ", groups.distanceBetween(player(), c)
+			);
 			i += 1;
 		}
 	}
@@ -131,6 +137,11 @@ DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
 }
 
 void DirectionsCommand::exec(const StringVector& /*args*/) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
 	print("From here, you can go toward:");
 	for(const auto& pair: player()->node()->paths()) {
 		print("  ", join(pair.second), ": toward ", pair.first->name());
@@ -165,6 +176,11 @@ GoCommand::GoCommand(TextMoba* textMoba)
 }
 
 void GoCommand::exec(const StringVector& args) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
 	if(args.size() != 2) {
 		print("I don't understand where you want to go. Type");
 		print("  ", args[0], " <direction>");
@@ -181,5 +197,62 @@ void GoCommand::exec(const StringVector& args) {
 		else {
 			print("Unknown direction \"", dir, "\"");
 		}
+	}
+}
+
+
+
+AttackCommand::AttackCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+{
+	_names.emplace_back("attack");
+	_names.emplace_back("a");
+
+	_desc = "  Attack the enemy number n, where n is the number you can\n"
+	        "  see when you run the command look.";
+}
+
+void AttackCommand::exec(const StringVector& args) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
+	if(args.size() != 2) {
+		print("I don't understand who you want to attack. Type");
+		print("  ", args[0], " <character-number>");
+		print("where <character-number> is the number displayed");
+		print("when you type \"look\".");
+	}
+	else {
+		unsigned index = 9999;
+		try {
+			index = std::stoi(args[1]);
+		}
+		catch(std::invalid_argument) {
+			print("I don't understand who you try to attack.");
+			return;
+		}
+
+		CharacterSP target = player()->node()->characterAt(index);
+
+		if(!target || !target->isAlive()) {
+			print("Invalid target.");
+			return;
+		}
+
+		if(target->team() == player()->team()) {
+			print("You cannot attack allies.");
+			return;
+		}
+
+		CharacterGroups groups = player()->node()->characterGroups();
+		if(groups.distanceBetween(player(), target) > player()->range()) {
+			print("Target out of range.");
+			return;
+		}
+
+		player()->attack(target);
+		tm()->nextTurn();
 	}
 }

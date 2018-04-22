@@ -34,6 +34,7 @@ public:
 	const lair::String& name() const;
 	int sortIndex() const;
 	bool playable() const;
+	bool building() const;
 
 	Place defaultPlace() const;
 
@@ -56,6 +57,7 @@ public:
 	lair::String _name;
 	int          _sortIndex;
 	bool         _playable;
+	bool         _building;
 
 	Place        _defaultPlace;
 

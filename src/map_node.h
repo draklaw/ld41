@@ -71,6 +71,7 @@ public:
 	const lair::String& tower() const;
 	const lair::String& fonxus() const;
 
+	CharacterSP characterAt(unsigned index) const;
 	const CharacterSet& characters() const;
 	CharacterGroups characterGroups() const;
 

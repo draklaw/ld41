@@ -61,14 +61,15 @@ unsigned Character::index() const {
 }
 
 
-String Character::name() const {
+String Character::name(bool showIndex) const {
 	if(isPlayer()) {
 		return "you";
 	}
 
-	if(_node)
+	if(showIndex && _node) {
 		return cat(teamName(), " ", className(), " ",
 		           _node->characterIndex(shared_from_this()));
+	}
 
 	return cat(teamName(), " ", className());
 }

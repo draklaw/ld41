@@ -220,6 +220,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_addCommand<DirectionsCommand>();
 	_addCommand<WaitCommand>();
 	_addCommand<GoCommand>();
+	_addCommand<AttackCommand>();
 }
 
 
@@ -339,10 +340,25 @@ void TextMoba::killCharacter(CharacterSP character) {
 
 
 void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
+	if(player() && character != player() && player()->isAlive()
+	        && !character->cClass()->building()
+	        && character->node() == player()->node()) {
+		print(character->name(), " leaves the area.");
+	}
+
 	if(character->node()) {
 		character->node()->removeCharacter(character);
 	}
+
 	character->_node = dest;
+	character->_place = character->cClass()->defaultPlace();
+
+	if(player() && character != player() && player()->isAlive()
+	        && !character->cClass()->building()
+	        && character->node() == player()->node()) {
+		print(character->name(false), " enters the area.");
+	}
+
 	if(dest) {
 		dest->addCharacter(character);
 	}
@@ -542,6 +558,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			cClass->_name      = getString(obj, "name", "<fixme_no_name>");
 			cClass->_sortIndex = getInt(obj, "sort_index", 9999);
 			cClass->_playable  = getBool(obj, "playable", false);
+			cClass->_building  = getBool(obj, "building", false);
 
 			String defaultPlace = getString(obj, "default_place", "back");
 			cClass->_defaultPlace = (defaultPlace == "back")? BACK: FRONT;

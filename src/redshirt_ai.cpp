@@ -44,7 +44,7 @@ void RedshirtAi::play() {
 	if(!c || !c->isAlive())
 		return;
 
-	dbgLogger.log(c->debugName(), " turn:");
+//	dbgLogger.log(c->debugName(), " turn:");
 
 	Team enemy = c->enemyTeam();
 
@@ -59,7 +59,7 @@ void RedshirtAi::play() {
 
 		if(target) {
 			_target = target;
-			dbgLogger.info("  Attack ", target->debugName());
+//			dbgLogger.info("  Attack ", target->debugName());
 			c->attack(target);
 		}
 	}
@@ -70,7 +70,7 @@ void RedshirtAi::play() {
 		}
 
 		if(dest) {
-			dbgLogger.info("  Go to ", dest->name());
+//			dbgLogger.info("  Go to ", dest->name());
 			c->moveTo(dest);
 		}
 	}
