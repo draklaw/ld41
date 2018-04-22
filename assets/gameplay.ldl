@@ -105,22 +105,22 @@ nodes = {
 	// river
 	ctl = {
 		name = "the top lane between red and blue 2nd towers"
-		image = 'jungle.png'
+		image = 'lane.png'
 		position = Vector(35, 358)
 	}
 	cbl = {
 		name = "the bottom lane between red and blue 2nd towers"
-		image = 'jungle.png'
+		image = 'lane.png'
 		position = Vector(35, 358)
 	}
 	ctr = {
 		name = "the central river near the top lane"
-		image = 'jungle.png'
+		image = 'river.png'
 		position = Vector(35, 358)
 	}
 	cbr = {
 		name = "the central river near the bottom lane"
-		image = 'jungle.png'
+		image = 'river.png'
 		position = Vector(35, 358)
 	}
 }
@@ -132,7 +132,7 @@ paths = [
 		from = bf
 		to   = btt1
 		from_dirs = [ "top" ]
-		to_dirs   = [ "fonxus", "blue" ]
+		to_dirs   = [ "blue", "fonxus" ]
 	}
 	{
 		from = btt1
@@ -151,7 +151,7 @@ paths = [
 		from = bf
 		to   = bbt1
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "fonxus", "blue" ]
+		to_dirs   = [ "blue", "fonxus" ]
 	}
 	{
 		from = bbt1
@@ -198,7 +198,7 @@ paths = [
 		from = rf
 		to   = rtt1
 		from_dirs = [ "top" ]
-		to_dirs   = [ "fonxus", "red" ]
+		to_dirs   = [ "red", "fonxus" ]
 	}
 	{
 		from = rtt1
@@ -217,7 +217,7 @@ paths = [
 		from = rf
 		to   = rbt1
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "fonxus", "red" ]
+		to_dirs   = [ "red", "fonxus" ]
 	}
 	{
 		from = rbt1
@@ -259,24 +259,50 @@ paths = [
 	}
 
 	// Center
+	// Top
+	{
+		from = ctl
+		to   = btt2
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	{
+		from = ctl
+		to   = rtt2
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	// Bot
+	{
+		from = cbl
+		to   = bbt2
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	{
+		from = cbl
+		to   = rbt2
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
 	// River
 	{
 		from = ctl
 		to   = ctr
-		from_dirs = [ "top" ]
-		to_dirs   = [ "bot", "river" ]
+		from_dirs = [ "bot", "river" ]
+		to_dirs   = [ "top" ]
 	}
 	{
 		from = ctr
 		to   = cbr
-		from_dirs = [ "top" ]
-		to_dirs   = [ "bot" ]
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "top" ]
 	}
 	{
 		from = cbr
 		to   = cbl
-		from_dirs = [ "top", "river" ]
-		to_dirs   = [ "bot" ]
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "top", "river" ]
 	}
 	// Blue jungle
 	{
