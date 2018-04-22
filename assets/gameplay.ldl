@@ -1,0 +1,307 @@
+motd = """Welcome to ld41 !
+
+You need to destroy the enemy fonxus (the thing in the middle of their base) and protect yours.
+
+You must enter commands to act. Everytime you perform an action (moving, attacking, etc.), a turn is played and all character moves. You act first, use this at your advantage !
+
+You can see the list of available commands anytime by typing "help", "h" or simply "?". Good luck !
+"""
+
+nodes = {
+	// Blue side
+	bf = {
+		name = "the blue fonxus"
+		image = 'fonxus.png'
+		position = Vector(30, 450)
+	}
+	btt1 = {
+		name = "the blue top 1st tower"
+		image = 'base_tower.png'
+		position = Vector(35, 358)
+	}
+	btl1 = {
+		name = "the top lane between the blue 1st and 2nd tower"
+		image = 'lane.png'
+		position = Vector(35, 358)
+	}
+	btt2 = {
+		name = "the blue top 2nd tower"
+		image = 'lane_tower.png'
+		position = Vector(35, 358)
+	}
+	bbt1 = {
+		name = "the blue bottom 1st tower"
+		image = 'base_tower.png'
+		position = Vector(35, 358)
+	}
+	bbl1 = {
+		name = "the bottom lane between the blue 1st and 2nd tower"
+		image = 'lane.png'
+		position = Vector(35, 358)
+	}
+	bbt2 = {
+		name = "the blue bottom 2nd tower"
+		image = 'lane_tower.png'
+		position = Vector(35, 358)
+	}
+	bj1 = {
+		name = "the jungle near the 1st blue tower"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+	bj2 = {
+		name = "the jungle near the 2nd blue tower"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+
+	// red side
+	rf = {
+		name = "the red fonxus"
+		image = 'fonxus.png'
+		position = Vector(30, 450)
+	}
+	rtt1 = {
+		name = "the red top 1st tower"
+		image = 'base_tower.png'
+		position = Vector(35, 358)
+	}
+	rtl1 = {
+		name = "the top lane between the red 1st and 2nd tower"
+		image = 'lane.png'
+		position = Vector(35, 358)
+	}
+	rtt2 = {
+		name = "the red top 2nd tower"
+		image = 'lane_tower.png'
+		position = Vector(35, 358)
+	}
+	rbt1 = {
+		name = "the red bottom 1st tower"
+		image = 'base_tower.png'
+		position = Vector(35, 358)
+	}
+	rbl1 = {
+		name = "the bottom lane between the red 1st and 2nd tower"
+		image = 'lane.png'
+		position = Vector(35, 358)
+	}
+	rbt2 = {
+		name = "the red bottom 2nd tower"
+		image = 'lane_tower.png'
+		position = Vector(35, 358)
+	}
+	rj1 = {
+		name = "the jungle near the 1st red tower"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+	rj2 = {
+		name = "the jungle near the 2nd red tower"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+
+	// river
+	ctl = {
+		name = "the top lane between red and blue 2nd towers"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+	cbl = {
+		name = "the bottom lane between red and blue 2nd towers"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+	ctr = {
+		name = "the central river near the top lane"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+	cbr = {
+		name = "the central river near the bottom lane"
+		image = 'jungle.png'
+		position = Vector(35, 358)
+	}
+}
+
+paths = [
+	// Blue side
+	// Top
+	{
+		from = bf
+		to   = btt1
+		from_dirs = [ "top" ]
+		to_dirs   = [ "fonxus", "blue" ]
+	}
+	{
+		from = btt1
+		to   = btl1
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	{
+		from = btl1
+		to   = btt2
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	// Bot
+	{
+		from = bf
+		to   = bbt1
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "fonxus", "blue" ]
+	}
+	{
+		from = bbt1
+		to   = bbl1
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	{
+		from = bbl1
+		to   = bbt2
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	// Jungle
+	{
+		from = bj1
+		to   = bj2
+		from_dirs = [ "red" ]
+		to_dirs   = [ "blue" ]
+	}
+	// Cross
+	{
+		from = btt1
+		to   = bbt1
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "top" ]
+	}
+	{
+		from = btl1
+		to   = bj1
+		from_dirs = [ "bot", "jungle" ]
+		to_dirs   = [ "top" ]
+	}
+	{
+		from = bbl1
+		to   = bj1
+		from_dirs = [ "top", "jungle" ]
+		to_dirs   = [ "bot" ]
+	}
+
+	// Red side
+	// Top
+	{
+		from = rf
+		to   = rtt1
+		from_dirs = [ "top" ]
+		to_dirs   = [ "fonxus", "red" ]
+	}
+	{
+		from = rtt1
+		to   = rtl1
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	{
+		from = rtl1
+		to   = rtt2
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	// Bot
+	{
+		from = rf
+		to   = rbt1
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "fonxus", "red" ]
+	}
+	{
+		from = rbt1
+		to   = rbl1
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	{
+		from = rbl1
+		to   = rbt2
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	// Jungle
+	{
+		from = rj1
+		to   = rj2
+		from_dirs = [ "blue" ]
+		to_dirs   = [ "red" ]
+	}
+	// Cross
+	{
+		from = rtt1
+		to   = rbt1
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "top" ]
+	}
+	{
+		from = rtl1
+		to   = rj1
+		from_dirs = [ "bot", "jungle" ]
+		to_dirs   = [ "top" ]
+	}
+	{
+		from = rbl1
+		to   = rj1
+		from_dirs = [ "top", "jungle" ]
+		to_dirs   = [ "bot" ]
+	}
+
+	// Center
+	// River
+	{
+		from = ctl
+		to   = ctr
+		from_dirs = [ "top" ]
+		to_dirs   = [ "bot", "river" ]
+	}
+	{
+		from = ctr
+		to   = cbr
+		from_dirs = [ "top" ]
+		to_dirs   = [ "bot" ]
+	}
+	{
+		from = cbr
+		to   = cbl
+		from_dirs = [ "top", "river" ]
+		to_dirs   = [ "bot" ]
+	}
+	// Blue jungle
+	{
+		from = bj2
+		to   = ctr
+		from_dirs = [ "top" ]
+		to_dirs   = [ "blue" ]
+	}
+	{
+		from = bj2
+		to   = cbr
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "blue" ]
+	}
+	// Red jungle
+	{
+		from = rj2
+		to   = ctr
+		from_dirs = [ "top" ]
+		to_dirs   = [ "red" ]
+	}
+	{
+		from = rj2
+		to   = cbr
+		from_dirs = [ "bot" ]
+		to_dirs   = [ "red" ]
+	}
+]

@@ -41,6 +41,7 @@
 #include <lair/ec/tile_layer_component.h>
 
 #include "console.h"
+#include "text_moba.h"
 
 
 using namespace lair;
@@ -148,6 +149,8 @@ public:
 	Input*      _downInput;
 	Input*      _upInput;
 	Input*      _okInput;
+
+	TextMoba    _textMoba;
 
 	EntityRef   _models;
 	EntityRef   _scene;

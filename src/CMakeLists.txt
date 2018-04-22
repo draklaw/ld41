@@ -33,6 +33,8 @@ add_executable(${CMAKE_PROJECT_NAME}
 	main.cpp
 	game.cpp
 	console.cpp
+	text_moba.cpp
+	commands.cpp
 	main_state.cpp
 	splash_state.cpp
 )

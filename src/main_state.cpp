@@ -76,7 +76,9 @@ MainState::MainState(Game* game)
       _rightInput(nullptr),
       _downInput(nullptr),
       _upInput(nullptr),
-      _okInput(nullptr)
+      _okInput(nullptr),
+
+      _textMoba(this, &_console)
 {
 	_entities.registerComponentManager(&_sprites);
 	_entities.registerComponentManager(&_collisions);
@@ -139,6 +141,8 @@ void MainState::initialize() {
 //	loadMusic("ending.mp3");
 
 //	AssetSP font = loader()->loadAsset<BitmapFontLoader>("droid_sans_24.json");
+
+	_textMoba.initialize("gameplay.ldl");
 
 	loader()->waitAll();
 

@@ -36,6 +36,8 @@ public:
 	typedef std::function<void(const lair::String&)> AddLineCallback;
 	typedef std::function<void(const lair::String&)> UpdateInputCallback;
 
+	static lair::String inputPrefix;
+
 public:
 	Console();
 

@@ -23,6 +23,7 @@
 
 #include <lair/core/log.h>
 #include <lair/core/text.h>
+#include <lair/core/parse.h>
 
 #include "console.h"
 
@@ -30,9 +31,13 @@
 using namespace lair;
 
 
+String Console::inputPrefix = "> ";
+
+
 Console::Console()
-    : _cursorPos(0)
-    , _inputSize(0)
+    : _cursorPos(inputPrefix.size())
+    , _inputSize(inputPrefix.size())
+    , _input(inputPrefix)
 {
 }
 
@@ -59,9 +64,22 @@ const String& Console::line(unsigned i) const {
 
 
 void Console::writeLine(const String& line) {
-	_lines.push_back(line);
+	auto it  = line.begin();
+	auto end = line.end();
+	auto lineBegin = it;
+
+	for(; it != end; ++it) {
+		if(*it == '\n') {
+			_lines.emplace_back(lineBegin, it);
+			if(onAddLine)
+				onAddLine(_lines.back());
+			lineBegin = it + 1;
+		}
+	}
+
+	_lines.emplace_back(lineBegin, it);
 	if(onAddLine)
-		onAddLine(line);
+		onAddLine(_lines.back());
 }
 
 
@@ -98,13 +116,13 @@ void Console::inputText(const String& text) {
 void Console::backspace() {
 	auto end   = nextCharacter(_input, _input.begin(), _cursorPos);
 	auto begin = prevCharacter(_input, end);
-	if(begin != end) {
+
+	if(begin != end && begin - _input.begin() >= int( inputPrefix.size())) {
 		_input.erase(begin, end);
 		_cursorPos -= 1;
+		if(onUpdateInput)
+			onUpdateInput(_input);
 	}
-
-	if(onUpdateInput)
-		onUpdateInput(_input);
 
 //	int index = nextCharacter(_input, 0, _cursorPos);
 //	dbgLogger.warning("Input: ", _input.substr(0, index), "#", _input.substr(index));
@@ -112,7 +130,7 @@ void Console::backspace() {
 
 
 void Console::moveCursor(int offset) {
-	_cursorPos = clamp(int(_cursorPos) + offset, 0, int(_inputSize));
+	_cursorPos = clamp<int>(_cursorPos + offset, inputPrefix.size(), _inputSize);
 
 //	int index = nextCharacter(_input, 0, _cursorPos);
 //	dbgLogger.warning("Input: ", _input.substr(0, index), "#", _input.substr(index));
@@ -120,13 +138,13 @@ void Console::moveCursor(int offset) {
 
 
 void Console::execLine() {
-	if(_execCommand)
-		_execCommand(_input);
 	writeLine(_input);
+	if(_execCommand)
+		_execCommand(_input.substr(inputPrefix.size()));
 
-	_input.clear();
+	_input = inputPrefix;
 	_inputSize = 0;
-	_cursorPos = 0;
+	_cursorPos = inputPrefix.size();
 
 	if(onUpdateInput)
 		onUpdateInput(_input);
@@ -144,6 +162,8 @@ ConsoleView::ConsoleView(Console* console, unsigned width)
 	_console->onUpdateInput = std::bind(&ConsoleView::_updateInput, this, _1);
 
 	_inputLines.emplace_back();
+
+	_updateInput(_console->input());
 }
 
 
@@ -171,13 +191,14 @@ String ConsoleView::text(unsigned lineCount, int offset, Vector2i* cursor) const
 
 	i -= _viewLines.size();
 	unsigned inputPos = 0;
+	unsigned consoleCursor = _console->cursorPos();
 	for(; i < int(_inputLines.size()); ++i) {
 		text.push_back('\n');
 		text.append(_inputLines[i]);
 
 		unsigned size = charCount(_inputLines[i]);
-		if(cursor && inputPos <= _console->cursorPos()) {
-			*cursor = Vector2i(_console->cursorPos() - inputPos,
+		if(cursor && inputPos <= consoleCursor) {
+			*cursor = Vector2i(consoleCursor - inputPos,
 			                   i + _viewLines.size() - offset);
 		}
 		inputPos += size + 1;
