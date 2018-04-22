@@ -31,6 +31,7 @@
 #include "character.h"
 #include "ai.h"
 #include "redshirt_ai.h"
+#include "tower_ai.h"
 #include "tm_command.h"
 
 #include "text_moba.h"
@@ -599,7 +600,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			spawnCharacter("fonxus", (node->fonxus() == "blue")? BLUE: RED, node);
 		}
 		if(node->tower().size()) {
-			spawnCharacter("tower", (node->tower() == "blue")? BLUE: RED, node);
+			CharacterSP tower = spawnCharacter("tower", (node->tower() == "blue")? BLUE: RED, node);
+			tower->setAi<TowerAi>();
 		}
 	}
 
