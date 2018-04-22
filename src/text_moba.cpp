@@ -301,32 +301,32 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 			MapNodeSP node = std::make_shared<MapNode>();
 
-			node->id = id;
+			node->_id = id;
 
 			const Variant& nameVar = obj.get("name");
 			if(nameVar.isString())
-				node->name = nameVar.asString();
+				node->_name = nameVar.asString();
 			else
 				dbgLogger.error("Node without name");
 
 			const Variant& imageVar = obj.get("image");
 			if(imageVar.isString())
-				node->image = imageVar.asString();
+				node->_image = imageVar.asString();
 			else
 				dbgLogger.error("Node without image");
 
 			const Variant& posVar = obj.get("position");
 			if(posVar.isVarList() && posVar.asVarList().size() == 2) {
 				const VarList& pos = posVar.asVarList();
-				node->pos = Vector2(pos[0].asFloat(), pos[1].asFloat());
+				node->_pos = Vector2(pos[0].asFloat(), pos[1].asFloat());
 			}
 			else
 				dbgLogger.error("Node without position");
 
-			node->tower  = getString(obj, "tower");
-			node->fonxus = getString(obj, "fonxus");
+			node->_tower  = getString(obj, "tower");
+			node->_fonxus = getString(obj, "fonxus");
 
-			_nodes.emplace(node->id, node);
+			_nodes.emplace(node->id(), node);
 		}
 	}
 	else {
@@ -346,9 +346,9 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 				MapNodeSP to   = mapNode(toVar.asString());
 
 				StringVector& fromDirs =
-				        from->paths.emplace(to.get(),   StringVector()).first->second;
+				        from->_paths.emplace(to.get(),   StringVector()).first->second;
 				StringVector& toDirs =
-				        to  ->paths.emplace(from.get(), StringVector()).first->second;
+				        to  ->_paths.emplace(from.get(), StringVector()).first->second;
 
 				for(const Variant& dirVar: fromDirsVar.asVarList()) {
 					if(dirVar.isString()) {
@@ -403,9 +403,9 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	for(const auto& pair: _nodes) {
 		MapNodeSP node = pair.second;
 
-		if(node->tower.size()) {
+		if(node->tower().size()) {
 			CharacterSP tower = std::make_shared<Character>(characterClass("tower"));
-			tower->_team = (node->tower == "blue")? BLUE: RED;
+			tower->_team = (node->tower() == "blue")? BLUE: RED;
 			moveCharacter(tower, node);
 		}
 	}

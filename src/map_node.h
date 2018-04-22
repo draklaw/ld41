@@ -31,24 +31,34 @@
 class MapNode : public std::enable_shared_from_this<MapNode> {
 public:
 	typedef std::unordered_map<MapNode*, StringVector> NodeMap;
-	typedef std::unordered_set<CharacterSP>            CharacterSet;
 
 public:
+	const lair::String& id() const;
+	const lair::String& name() const;
+
+	const NodeMap& paths() const;
 	MapNodeSP destination(const lair::String& direction) const;
 
+	const lair::Path& image() const;
+	const lair::Vector2& pos() const;
+
+	const lair::String& tower() const;
+	const lair::String& fonxus() const;
+
+	const CharacterSet& characters() const;
 	void addCharacter(CharacterSP character);
 	void removeCharacter(CharacterSP character);
 
 public:
-	lair::String  id;
-	lair::String  name;
-	NodeMap       paths;
-	lair::Path    image;
-	lair::Vector2 pos;
-	lair::String  tower;
-	lair::String  fonxus;
+	lair::String  _id;
+	lair::String  _name;
+	NodeMap       _paths;
+	lair::Path    _image;
+	lair::Vector2 _pos;
+	lair::String  _tower;
+	lair::String  _fonxus;
 
-	CharacterSet  characters;
+	CharacterSet  _characters;
 };
 
 

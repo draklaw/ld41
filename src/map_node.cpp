@@ -30,8 +30,23 @@
 using namespace lair;
 
 
+const String& MapNode::id() const {
+	return _id;
+}
+
+
+const String& MapNode::name() const {
+	return _name;
+}
+
+
+const MapNode::NodeMap& MapNode::paths() const {
+	return _paths;
+}
+
+
 MapNodeSP MapNode::destination(const String& direction) const {
-	for(const auto& pair: paths) {
+	for(const auto& pair: _paths) {
 		for(const String& dir: pair.second) {
 			if(dir == direction) {
 				return pair.first->shared_from_this();
@@ -42,11 +57,36 @@ MapNodeSP MapNode::destination(const String& direction) const {
 }
 
 
+const Path& MapNode::image() const {
+	return _image;
+}
+
+
+const Vector2& MapNode::pos() const {
+	return _pos;
+}
+
+
+const String& MapNode::tower() const {
+	return _tower;
+}
+
+
+const String& MapNode::fonxus() const {
+	return _fonxus;
+}
+
+
+const CharacterSet& MapNode::characters() const {
+	return _characters;
+}
+
+
 void MapNode::addCharacter(CharacterSP character) {
-	characters.emplace(character);
+	_characters.emplace(character);
 }
 
 
 void MapNode::removeCharacter(CharacterSP character) {
-	characters.erase(character);
+	_characters.erase(character);
 }

@@ -25,7 +25,7 @@
 
 #include <utility>
 #include <unordered_map>
-#include <unordered_set>
+#include <set>
 
 #include <lair/core/lair.h>
 #include <lair/core/path.h>
@@ -65,6 +65,8 @@ typedef std::shared_ptr<TMCommand>      TMCommandSP;
 
 typedef std::vector<int>          IntVector;
 typedef std::vector<lair::String> StringVector;
+
+typedef std::set<CharacterSP>     CharacterSet;
 
 
 

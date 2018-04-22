@@ -68,6 +68,8 @@ String toLower(const String& string) {
 }
 
 
+
+
 HelpCommand::HelpCommand(TextMoba* textMoba)
     : TMCommand(textMoba)
 {
@@ -100,21 +102,21 @@ LookCommand::LookCommand(TextMoba* textMoba)
 void LookCommand::exec(const StringVector& args) {
 	if(args.size() == 1) {
 		MapNodeSP node = player()->node();
-		print("You are at ", node->name, ".");
+		print("You are at ", node->name(), ".");
 
-		if(node->characters.size() < 2) {
+		if(node->characters().size() < 2) {
 			print("There is nothing here.");
 		}
 		else {
 			print("Here, there is");
 			unsigned i = 0;
-			for(CharacterSP c: node->characters) {
+			for(CharacterSP c: node->characters()) {
 				if(c == player())
 					continue;
-				i += 1;
 				print("  ", i, ": a level ", c->level() + 1, " ",
 				      c->teamName(), " ", c->className(), " (",
 				      c->hp(), " / ", c->maxHP(), ")");
+				i += 1;
 			}
 		}
 	}
@@ -133,8 +135,8 @@ DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
 
 void DirectionsCommand::exec(const StringVector& /*args*/) {
 	print("From here, you can go toward:");
-	for(const auto& pair: player()->node()->paths) {
-		print("  ", join(pair.second), ": toward ", pair.first->name);
+	for(const auto& pair: player()->node()->paths()) {
+		print("  ", join(pair.second), ": toward ", pair.first->name());
 	}
 }
 
