@@ -40,6 +40,11 @@ const String& CharacterClass::name() const {
 }
 
 
+int CharacterClass::sortIndex() const {
+	return _sortIndex;
+}
+
+
 bool CharacterClass::playable() const {
 	return _playable;
 }

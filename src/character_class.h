@@ -32,6 +32,7 @@ class CharacterClass {
 public:
 	const lair::String& id() const;
 	const lair::String& name() const;
+	int sortIndex() const;
 	bool playable() const;
 
 	const IntVector maxHP() const;
@@ -51,6 +52,7 @@ public:
 public:
 	lair::String _id;
 	lair::String _name;
+	int          _sortIndex;
 	bool         _playable;
 
 	IntVector    _maxHP;

@@ -30,15 +30,20 @@
 
 class Character {
 public:
-	Character(CharacterClassSP cClass, unsigned level = 0);
+	Character(TextMoba* textMoba, CharacterClassSP cClass, unsigned index,
+	          unsigned level = 0);
 
 	CharacterClassSP cClass() const;
 	const lair::String& className() const;
+
+	unsigned index() const;
 
 	MapNodeSP node() const;
 
 	Team team() const;
 	const lair::String& teamName() const;
+
+	bool isPlayer() const;
 
 	unsigned maxHP() const;
 	unsigned maxMana() const;
@@ -51,7 +56,11 @@ public:
 	bool deathTime() const;
 
 public:
+	TextMoba* _textMoba;
+
 	CharacterClassSP _cClass;
+	unsigned _index;
+
 	MapNodeSP _node;
 	Team     _team;
 

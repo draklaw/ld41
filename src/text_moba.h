@@ -53,8 +53,8 @@ enum Place {
 class MapNode;
 class CharacterClass;
 class Character;
-class TextMoba;
 class TMCommand;
+class TextMoba;
 
 typedef std::shared_ptr<MapNode>        MapNodeSP;
 typedef std::weak_ptr<MapNode>          MapNodeWP;
@@ -66,7 +66,12 @@ typedef std::shared_ptr<TMCommand>      TMCommandSP;
 typedef std::vector<int>          IntVector;
 typedef std::vector<lair::String> StringVector;
 
-typedef std::set<CharacterSP>     CharacterSet;
+
+struct CharacterOrder {
+	bool operator()(const CharacterSP& c0, const CharacterSP& c1) const;
+};
+
+typedef std::set<CharacterSP, CharacterOrder> CharacterSet;
 
 
 
@@ -86,6 +91,8 @@ public:
 	CharacterClassSP characterClass(const lair::String& id);
 	CharacterSP player();
 
+	CharacterSP spawnCharacter(const lair::String& className, Team team,
+	                           MapNodeSP node = MapNodeSP());
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void nextTurn();
 
@@ -116,9 +123,12 @@ private:
 	TMCommandList _commands;
 	TMCommandMap  _commandMap;
 
-	NodeMap     _nodes;
-	ClassMap    _classes;
-	CharacterSP _player;
+	NodeMap      _nodes;
+	ClassMap     _classes;
+
+	unsigned     _charIndex;
+	CharacterSet _characters;
+	CharacterSP  _player;
 };
 
 

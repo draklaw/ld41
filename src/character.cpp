@@ -30,8 +30,10 @@
 using namespace lair;
 
 
-Character::Character(CharacterClassSP cClass, unsigned level)
-    : _cClass(cClass)
+Character::Character(TextMoba* textMoba, CharacterClassSP cClass, unsigned index, unsigned level)
+    : _textMoba(textMoba)
+    , _cClass(cClass)
+    , _index(index)
     , _node(nullptr)
     , _team(BLUE)
     , _level(level)
@@ -52,6 +54,11 @@ const String& Character::className() const {
 }
 
 
+unsigned Character::index() const {
+	return _index;
+}
+
+
 MapNodeSP Character::node() const {
 	return _node;
 }
@@ -69,6 +76,11 @@ const String& Character::teamName() const {
 	    "neutral",
 	};
 	return tn[_team];
+}
+
+
+bool Character::isPlayer() const {
+	return this == _textMoba->player().get();
 }
 
 

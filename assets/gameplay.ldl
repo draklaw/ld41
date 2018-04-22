@@ -347,22 +347,24 @@ paths = [
 classes = {
 	// Each character has 6 levels.
 	warrior = {
-		name     = "warrior"
-		playable = true
-		max_hp   = [  120,  160,  200,  240,  280,  320 ]
-		max_mana = [   20,   25,   30,   35,   40,   45 ]
-		xp       = [ 1000, 2000, 3000, 4000, 5000, 6000 ]
-		damage   = [   20,   25,   30,   35,   40,   45 ]
-		range    = 1
-		speed    = 3
+		name       = "warrior"
+		playable   = true
+		max_hp     = [  120,  160,  200,  240,  280,  320 ]
+		max_mana   = [   20,   25,   30,   35,   40,   45 ]
+		xp         = [ 1000, 2000, 3000, 4000, 5000, 6000 ]
+		damage     = [   20,   25,   30,   35,   40,   45 ]
+		range      = 1
+		speed      = 3
+		sort_index = 0
 	}
 
 	// Towers gain level with time.
 	tower = {
-		name     = "tower"
-		max_hp   = 1000
-		damage   = [ 40, 50, 60, 70, 80, 90 ]
-		range    = 2
-		speed    = 0
+		name       = "tower"
+		max_hp     = 1000
+		damage     = [ 40, 50, 60, 70, 80, 90 ]
+		range      = 2
+		speed      = 0
+		sort_index = 2
 	}
 }

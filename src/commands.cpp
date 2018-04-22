@@ -109,9 +109,9 @@ void LookCommand::exec(const StringVector& args) {
 		}
 		else {
 			print("Here, there is");
-			unsigned i = 0;
+			unsigned i = 1;
 			for(CharacterSP c: node->characters()) {
-				if(c == player())
+				if(c != player())
 					continue;
 				print("  ", i, ": a level ", c->level() + 1, " ",
 				      c->teamName(), " ", c->className(), " (",
