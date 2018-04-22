@@ -78,11 +78,16 @@ private:
 
 class ConsoleView {
 public:
-	ConsoleView(Console* console, unsigned width);
+	ConsoleView(Console* console, unsigned width, unsigned height);
 
 	unsigned lineCount() const;
-	lair::String text(unsigned lineCount, int offset = -1,
-	                  lair::Vector2i* cursor = nullptr) const;
+	lair::String text(lair::Vector2i* cursor = nullptr) const;
+
+	int scrollPos() const;
+	int realScrollPos() const;
+	int maxScrollPos() const;
+	void scrollTo(int scrollPos);
+	void scroll(int offset);
 
 	void _addLine(const lair::String& line);
 	void _updateInput(const lair::String& input);
@@ -97,9 +102,11 @@ private:
 private:
 	Console*      _console;
 	unsigned      _width;
+	unsigned      _height;
 	UnsignedDeque _viewFromConsole;
 	StringDeque   _viewLines;
 	StringDeque   _inputLines;
+	int           _scrollPos;
 };
 
 

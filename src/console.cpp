@@ -154,9 +154,11 @@ void Console::execLine() {
 
 
 
-ConsoleView::ConsoleView(Console* console, unsigned width)
+ConsoleView::ConsoleView(Console* console, unsigned width, unsigned height)
     : _console(console)
     , _width(width)
+    , _height(height)
+    , _scrollPos(-1)
 {
 	using namespace std::placeholders;
 
@@ -174,44 +176,80 @@ unsigned ConsoleView::lineCount() const {
 }
 
 
-String ConsoleView::text(unsigned lineCount, int offset, Vector2i* cursor) const {
-	unsigned maxOffset = this->lineCount() - lineCount;
-	if(offset < 0) {
-		offset = std::max(0, int(maxOffset) + offset + 1);
-	}
+String ConsoleView::text(Vector2i* cursor) const {
+	int offset = realScrollPos();
 
 	if(cursor)
 		*cursor = Vector2i(-1, -1);
 
 	String text;
-	int end = std::min(offset + int(lineCount), int(_viewLines.size()));
-	int i = offset;
-	for(; i < end; ++i) {
+	int end = std::min<int>(offset + _height, _viewLines.size());
+	int row = 0;
+	for(int i = offset; i < end; ++i, ++row) {
 		text.push_back('\n');
 		text.append(_viewLines[i]);
 	}
 
-	i -= _viewLines.size();
+	end = std::min<int>(_inputLines.size(), _height - row);
 	unsigned inputPos = 0;
 	unsigned consoleCursor = _console->cursorPos();
-	for(; i < int(_inputLines.size()); ++i) {
+	for(int i = 0; i < end; ++i, ++row) {
 		text.push_back('\n');
 		text.append(_inputLines[i]);
 
 		unsigned size = charCount(_inputLines[i]);
 		if(cursor && inputPos <= consoleCursor) {
 			*cursor = Vector2i(consoleCursor - inputPos,
-			                   i + _viewLines.size() - offset);
+			                   row);
 		}
 		inputPos += size + 1;
 	}
 
-	end = offset + lineCount - _viewLines.size();
-	for(; i < end; ++i)
+	for(; row < int(_height); ++row)
 		text.push_back('\n');
 
 	return text;
 }
+
+
+int ConsoleView::scrollPos() const {
+	return _scrollPos;
+}
+
+
+int ConsoleView::realScrollPos() const {
+	if(_scrollPos < 0) {
+		return std::max(0, maxScrollPos() + _scrollPos + 1);
+	}
+	return _scrollPos;
+}
+
+
+int ConsoleView::maxScrollPos() const {
+	return std::max<int>(0, lineCount() - _height);
+}
+
+
+void ConsoleView::scrollTo(int scrollPos) {
+	if(scrollPos < maxScrollPos()) {
+		_scrollPos = scrollPos;
+	}
+	else {
+		_scrollPos = -1;
+	}
+}
+
+
+void ConsoleView::scroll(int offset) {
+	int real = realScrollPos();
+	if(offset < 0 && -offset > real) {
+		scrollTo(0);
+	}
+	else {
+		scrollTo(real + offset);
+	}
+}
+
 
 void ConsoleView::_addLine(const String& line) {
 	_viewFromConsole.emplace_back(_viewLines.size());
@@ -222,6 +260,7 @@ void ConsoleView::_addLine(const String& line) {
 void ConsoleView::_updateInput(const String& input) {
 	_inputLines.clear();
 	_appendLines(_inputLines, input);
+	scrollTo(-1);
 }
 
 

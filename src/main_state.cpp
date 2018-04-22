@@ -61,7 +61,7 @@ MainState::MainState(Game* game)
       _inputs(sys(), &log()),
 
       _console(),
-      _consoleView(&_console, 60),
+      _consoleView(&_console, 60, 36),
 
       _camera(),
 
@@ -345,6 +345,12 @@ void MainState::keyDown(unsigned scancode, unsigned /*keycode*/, uint16 /*mod*/,
 	case SDL_SCANCODE_RIGHT:
 		_console.moveCursor(1);
 		break;
+	case SDL_SCANCODE_PAGEUP:
+		_consoleView.scroll(-3);
+		break;
+	case SDL_SCANCODE_PAGEDOWN:
+		_consoleView.scroll(3);
+		break;
 	}
 }
 
@@ -376,7 +382,7 @@ void MainState::updateFrame() {
 	BitmapTextComponent* text = _texts.get(_text);
 	if(text) {
 		Vector2i cursor(-1, -1);
-		text->setText(_consoleView.text(36, -1, &cursor));
+		text->setText(_consoleView.text(&cursor));
 
 		const BitmapFont& font = text->font()->get();
 
