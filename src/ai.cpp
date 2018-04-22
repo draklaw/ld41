@@ -64,15 +64,33 @@ void RedshirtAi::play() {
 	if(!c || !c->isAlive())
 		return;
 
-	dbgLogger.log(c->className(), " ", c->index(), " turn:");
+	dbgLogger.log(c->debugName(), " turn:");
 
-	MapNodeSP dest = c->node()->destination((c->team() == BLUE)? "red": "blue");
-	if(!dest) {
-		dest = c->node()->destination((_lane == TOP)? "top": "bot");
+	Team enemy = c->enemyTeam();
+
+	CharacterGroups groups = c->node()->characterGroups();
+	if(groups.count(enemy)) {
+		CharacterSP target = _target.lock();
+
+		if(!target || !target->isAlive()) {
+			target = groups.pickClosestEnemy(c);
+		}
+
+		if(target) {
+			_target = target;
+			dbgLogger.info("  Attack ", target->debugName());
+			c->attack(target);
+		}
 	}
+	else {
+		MapNodeSP dest = c->node()->destination((c->team() == BLUE)? "red": "blue");
+		if(!dest) {
+			dest = c->node()->destination((_lane == TOP)? "top": "bot");
+		}
 
-	if(dest) {
-		dbgLogger.info("  Go to ", dest->name());
-		c->moveTo(dest);
+		if(dest) {
+			dbgLogger.info("  Go to ", dest->name());
+			c->moveTo(dest);
+		}
 	}
 }

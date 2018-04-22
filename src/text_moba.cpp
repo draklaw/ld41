@@ -156,6 +156,38 @@ bool CharacterOrder::operator()(const CharacterSP& c0, const CharacterSP& c1) co
 
 
 
+const String& teamName(Team team) {
+	static String names[] = {
+	    "blue",
+	    "red",
+	    "neutral",
+	};
+	return names[team];
+}
+
+const String& placeName(Place place) {
+	static String names[] = {
+	    "back",
+	    "front",
+	};
+	return names[place];
+}
+
+const String& laneName(Lane lane) {
+	static String names[] = {
+	    "top",
+	    "bot",
+	};
+	return names[lane];
+}
+
+Team enemyTeam(Team team) {
+	return Team(team ^ 0x01);
+}
+
+
+
+
 TextMoba::TextMoba(MainState* mainState, Console* console)
     : _mainState(mainState)
     , _console(console)
@@ -246,6 +278,35 @@ CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
 }
 
 
+CharacterSP TextMoba::spawnRedshirt(Team team, Lane lane) {
+	MapNodeSP fonxus = mapNode((team == BLUE)? "bf": "rf");
+	CharacterSP redshirt = spawnCharacter("redshirt", team, fonxus);
+	redshirt->setAi<RedshirtAi>(lane);
+	dbgLogger.info("  RedshirtAi: ", lane);
+	return redshirt;
+}
+
+
+void TextMoba::spawnRedshirts(unsigned count) {
+	for(unsigned i = 0; i < count; ++i) {
+		spawnRedshirt(BLUE, TOP);
+		spawnRedshirt(BLUE, BOT);
+		spawnRedshirt(RED,  TOP);
+		spawnRedshirt(RED,  BOT);
+	}
+}
+
+
+void TextMoba::destroyCharacter(CharacterSP character) {
+	dbgLogger.log("Destroy ", character->debugName());
+	if(character->node()) {
+		character->node()->removeCharacter(character);
+		character->_node = nullptr;
+	}
+	_characters.erase(character);
+}
+
+
 void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 	if(character->node()) {
 		character->node()->removeCharacter(character);
@@ -275,25 +336,6 @@ void TextMoba::nextTurn() {
 
 	_console->writeLine(cat("End of turn ", _turn));
 	_execCommand("look");
-}
-
-
-void TextMoba::spawnRedshirts(unsigned count) {
-	for(unsigned i = 0; i < count; ++i) {
-		spawnRedshirt(BLUE, TOP);
-		spawnRedshirt(BLUE, BOT);
-		spawnRedshirt(RED,  TOP);
-		spawnRedshirt(RED,  BOT);
-	}
-}
-
-
-CharacterSP TextMoba::spawnRedshirt(Team team, Lane lane) {
-	MapNodeSP fonxus = mapNode((team == BLUE)? "bf": "rf");
-	CharacterSP redshirt = spawnCharacter("redshirt", team, fonxus);
-	redshirt->setAi<RedshirtAi>(lane);
-	dbgLogger.info("  RedshirtAi: ", lane);
-	return redshirt;
 }
 
 
@@ -469,6 +511,10 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			cClass->_name      = getString(obj, "name", "<fixme_no_name>");
 			cClass->_sortIndex = getInt(obj, "sort_index", 9999);
 			cClass->_playable  = getBool(obj, "playable", false);
+
+			String defaultPlace = getString(obj, "default_place", "back");
+			cClass->_defaultPlace = (defaultPlace == "back")? BACK: FRONT;
+
 			cClass->_maxHP     = getClassStats(obj, "max_hp");
 			cClass->_maxMana   = getClassStats(obj, "max_mana");
 			cClass->_xp        = getClassStats(obj, "xp");

@@ -50,6 +50,11 @@ bool CharacterClass::playable() const {
 }
 
 
+Place CharacterClass::defaultPlace() const {
+	return _defaultPlace;
+}
+
+
 const IntVector CharacterClass::maxHP() const {
 	return _maxHP;
 }

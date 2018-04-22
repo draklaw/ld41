@@ -62,13 +62,14 @@ class Ai;
 class TMCommand;
 class TextMoba;
 
-typedef std::shared_ptr<MapNode>        MapNodeSP;
-typedef std::weak_ptr<MapNode>          MapNodeWP;
-typedef std::shared_ptr<CharacterClass> CharacterClassSP;
-typedef std::shared_ptr<Character>      CharacterSP;
-typedef std::weak_ptr<Character>        CharacterWP;
-typedef std::shared_ptr<Ai>             AiSP;
-typedef std::shared_ptr<TMCommand>      TMCommandSP;
+typedef std::shared_ptr<MapNode>         MapNodeSP;
+typedef std::weak_ptr<MapNode>           MapNodeWP;
+typedef std::shared_ptr<CharacterClass>  CharacterClassSP;
+typedef std::shared_ptr<Character>       CharacterSP;
+typedef std::shared_ptr<const Character> CharacterCSP;
+typedef std::weak_ptr<Character>         CharacterWP;
+typedef std::shared_ptr<Ai>              AiSP;
+typedef std::shared_ptr<TMCommand>       TMCommandSP;
 
 
 typedef std::vector<int>          IntVector;
@@ -79,8 +80,15 @@ struct CharacterOrder {
 	bool operator()(const CharacterSP& c0, const CharacterSP& c1) const;
 };
 
+typedef std::vector<CharacterSP> CharacterVector;
 typedef std::set<CharacterSP, CharacterOrder> CharacterSet;
 
+
+const lair::String& teamName(Team team);
+const lair::String& placeName(Place place);
+const lair::String& laneName(Lane lane);
+
+Team enemyTeam(Team team);
 
 
 class TextMoba {
@@ -101,11 +109,13 @@ public:
 
 	CharacterSP spawnCharacter(const lair::String& className, Team team,
 	                           MapNodeSP node = MapNodeSP());
+	CharacterSP spawnRedshirt(Team team, Lane lane);
+	void spawnRedshirts(unsigned count);
+
+	void destroyCharacter(CharacterSP character);
+
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void nextTurn();
-
-	void spawnRedshirts(unsigned count);
-	CharacterSP spawnRedshirt(Team team, Lane lane);
 
 	const TMCommandList& commands() const;
 	TMCommand* command(const lair::String& name) const;
@@ -118,6 +128,11 @@ public:
 	}
 
 	bool _execCommand(const lair::String& command);
+
+	template<typename... Args>
+	inline void print(Args&&... args) {
+		console()->writeLine(lair::cat(std::forward<Args>(args)...));
+	}
 
 private:
 	typedef std::unordered_map<lair::String, MapNodeSP>        NodeMap;

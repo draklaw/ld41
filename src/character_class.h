@@ -35,6 +35,8 @@ public:
 	int sortIndex() const;
 	bool playable() const;
 
+	Place defaultPlace() const;
+
 	const IntVector maxHP() const;
 	const IntVector maxMana() const;
 	const IntVector xp() const;
@@ -54,6 +56,8 @@ public:
 	lair::String _name;
 	int          _sortIndex;
 	bool         _playable;
+
+	Place        _defaultPlace;
 
 	IntVector    _maxHP;
 	IntVector    _maxMana;

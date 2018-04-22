@@ -110,11 +110,13 @@ void LookCommand::exec(const StringVector& args) {
 		}
 		else {
 			print("Here, there is");
-			unsigned i = 1;
+			unsigned i = 0;
 			for(CharacterSP c: node->characters()) {
-				if(c == player())
-					continue;
-				print("  ", i, ": a level ", c->level() + 1, " ",
+//				if(c == player())
+//					continue;
+				print("  ", i, ": ", c->isPlayer()? "You: ": "",
+				      "[", c->placeName(),
+				      "] a level ", c->level() + 1, " ",
 				      c->teamName(), " ", c->className(), " (",
 				      c->hp(), " / ", c->maxHP(), ")");
 				i += 1;

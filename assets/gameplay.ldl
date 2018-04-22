@@ -43,6 +43,7 @@ classes = {
 		range      = 1
 		speed      = 3
 		sort_index = 0
+		default_place = front
 	}
 
 	// Towers gain level with time.

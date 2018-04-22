@@ -36,6 +36,7 @@ Character::Character(TextMoba* textMoba, CharacterClassSP cClass, unsigned index
     , _index(index)
     , _node(nullptr)
     , _team(BLUE)
+    , _place(cClass->defaultPlace())
     , _level(level)
     , _xp(0)
     , _hp(cClass->maxHP(level))
@@ -60,6 +61,28 @@ unsigned Character::index() const {
 }
 
 
+String Character::name() const {
+	if(_node)
+		return cat(teamName(), " ", className(), " ",
+		           _node->characterIndex(shared_from_this()));
+	return cat(teamName(), " ", className());
+}
+
+
+String Character::debugName() const {
+	return cat(index(), ":", className(),
+	           " [", node()? node()->id(): "<nowhere>", ":", placeName(), "]");
+}
+
+
+String Character::shortDesc() const {
+	return cat("[", placeName(),
+	           "] a level ", level() + 1, " ",
+	           teamName(), " ", className(), " (",
+	           hp(), " / ", maxHP(), ")");
+}
+
+
 MapNodeSP Character::node() const {
 	return _node;
 }
@@ -70,18 +93,28 @@ Team Character::team() const {
 }
 
 
+Team Character::enemyTeam() const {
+	return ::enemyTeam(team());
+}
+
+
 const String& Character::teamName() const {
-	static String tn[] = {
-	    "blue",
-	    "red",
-	    "neutral",
-	};
-	return tn[_team];
+	return ::teamName(_team);
 }
 
 
 bool Character::isPlayer() const {
 	return this == _textMoba->player().get();
+}
+
+
+Place Character::place() const {
+	return _place;
+}
+
+
+const String& Character::placeName() const {
+	return ::placeName(_place);
 }
 
 
@@ -115,6 +148,16 @@ unsigned Character::mana() const {
 }
 
 
+unsigned Character::damage() const {
+	return _cClass->damage(_level);
+}
+
+
+unsigned Character::range() const {
+	return _cClass->range(_level);
+}
+
+
 bool Character::isAlive() const {
 	return _deathTime == 0;
 }
@@ -132,4 +175,35 @@ AiSP Character::ai() const {
 
 void Character::moveTo(MapNodeSP dest) {
 	_textMoba->moveCharacter(shared_from_this(), dest);
+}
+
+
+void Character::attack(CharacterSP target) {
+	// Save this because it won't be available if target is dead.
+	String targetName = target->name();
+
+	unsigned damage = this->damage();
+	target->takeDamage(damage);
+
+	dbgLogger.info(debugName(), " attack ", target->debugName(),
+	               " for ", damage, " damage");
+
+	if(target->isAlive() && node() == _textMoba->player()->node()) {
+		_textMoba->print(name(), " attack ", targetName,
+		                 " for ", damage, " damage");
+	}
+	if(!target->isAlive()) {
+		_textMoba->print(name(), " killed ", targetName);
+	}
+}
+
+
+void Character::takeDamage(unsigned damage) {
+	if(damage >= hp()) {
+		_hp = 0;
+		_textMoba->destroyCharacter(shared_from_this());
+	}
+	else {
+		_hp -= damage;
+	}
 }

@@ -49,7 +49,8 @@ public:
 	virtual void play() override;
 
 public:
-	Lane _lane;
+	Lane        _lane;
+	CharacterWP _target;
 };
 
 

@@ -30,6 +30,126 @@
 using namespace lair;
 
 
+CharacterGroups::CharacterGroups(const MapNode* node) {
+	_characters.resize(node->_characters.size());
+	std::copy(node->_characters.begin(), node->_characters.end(),
+	          _characters.begin());
+
+	std::stable_sort(_characters.begin(), _characters.end(),
+	                 [](CharacterSP c0, CharacterSP c1) {
+		if(c0->team() < c1->team())
+			return true;
+		if(c1->team() < c0->team())
+			return false;
+
+		if(c0->place() < c1->place())
+			return true;
+		return false;
+	});
+
+	_indices[0] = 0;
+
+	_indices[1] = _indices[0];
+	while(_indices[1] < count() &&
+	      get(_indices[1])->team() == BLUE &&
+	      get(_indices[1])->place() == BACK)
+		_indices[1] += 1;
+
+	_indices[2] = _indices[1];
+	while(_indices[2] < count() &&
+	      get(_indices[2])->team() == BLUE &&
+	      get(_indices[2])->place() == FRONT)
+		_indices[2] += 1;
+
+	_indices[3] = _indices[2];
+	while(_indices[3] < count() &&
+	      get(_indices[3])->team() == RED &&
+	      get(_indices[3])->place() == BACK)
+		_indices[3] += 1;
+
+	_indices[4] = count();
+
+//	dbgLogger.warning("Groups: ", _indices[0], ", ", _indices[1],
+//	        ", ", _indices[2], ", ", _indices[3], ", ", _indices[4]);
+//	unsigned i = 0;
+//	for(CharacterSP c: _characters) {
+//		dbgLogger.info("  ", i++, ": ", c->className(), " ", c->index());
+//	}
+}
+
+
+unsigned CharacterGroups::count() const {
+	return _characters.size();
+}
+
+
+unsigned CharacterGroups::count(Team team) const {
+	return _index(team + 1, 0) - _index(team, 0);
+}
+
+
+unsigned CharacterGroups::count(Team team, Place place) const {
+	return _index(team, place + 1) - _index(team, place);
+}
+
+
+CharacterSP CharacterGroups::get(unsigned index) const {
+	return _characters.at(index);
+}
+
+
+CharacterSP CharacterGroups::get(Team team, unsigned index) const {
+	return _characters.at(_index(team, 0) + index);
+}
+
+
+CharacterSP CharacterGroups::get(Team team, Place place, unsigned index) const {
+	return _characters.at(_index(team, place) + index);
+}
+
+
+unsigned CharacterGroups::_index(unsigned team, unsigned place) const {
+	return _indices[2 * team + place];
+}
+
+
+CharacterSP CharacterGroups::pick(Team team, Place place) const {
+	unsigned c = count(team, place);
+	if(c == 0)
+		return CharacterSP();
+	return get(team, place, rand() % c);
+}
+
+
+CharacterSP CharacterGroups::pickClosestEnemy(CharacterSP c, int range) const {
+	if(range < 0)
+		range = c->range();
+
+	Team enemy = c->enemyTeam();
+
+	if(c->place() == BACK && count(c->team(), FRONT)) {
+		range -= 1;
+	}
+
+	if(count(enemy, FRONT)) {
+		if(range > 0 && range == FRONT) {
+			return pick(enemy, FRONT);
+		}
+		else {
+			range -= 1;
+		}
+	}
+
+	if(range > 0 && count(enemy, BACK)) {
+		return pick(enemy, BACK);
+	}
+
+	return CharacterSP();
+}
+
+
+
+
 const String& MapNode::id() const {
 	return _id;
 }
@@ -79,6 +199,24 @@ const String& MapNode::fonxus() const {
 
 const CharacterSet& MapNode::characters() const {
 	return _characters;
+}
+
+
+CharacterGroups MapNode::characterGroups() const {
+	return CharacterGroups(this);
+}
+
+
+unsigned MapNode::characterIndex(CharacterCSP character) const {
+	auto it = _characters.find(std::const_pointer_cast<Character>(character));
+
+	if(it == _characters.end()) {
+		dbgLogger.error("MapNode::characterName: character ", character->debugName(),
+		                " not found.");
+		return 0;
+	}
+
+	return std::distance(_characters.begin(), it);
 }
 
 

@@ -38,12 +38,20 @@ public:
 
 	unsigned index() const;
 
+	lair::String name() const;
+	lair::String debugName() const;
+	lair::String shortDesc() const;
+
 	MapNodeSP node() const;
 
 	Team team() const;
+	Team enemyTeam() const;
 	const lair::String& teamName() const;
 
 	bool isPlayer() const;
+
+	Place place() const;
+	const lair::String& placeName() const;
 
 	unsigned maxHP() const;
 	unsigned maxMana() const;
@@ -51,6 +59,8 @@ public:
 	unsigned xp() const;
 	unsigned hp() const;
 	unsigned mana() const;
+	unsigned damage() const;
+	unsigned range() const;
 
 	bool isAlive() const;
 	bool deathTime() const;
@@ -64,6 +74,8 @@ public:
 	}
 
 	void moveTo(MapNodeSP dest);
+	void attack(CharacterSP target);
+	void takeDamage(unsigned damage);
 
 public:
 	TextMoba* _textMoba;
@@ -73,6 +85,8 @@ public:
 
 	MapNodeSP _node;
 	Team     _team;
+
+	Place    _place;
 
 	unsigned _level;
 	unsigned _xp;
