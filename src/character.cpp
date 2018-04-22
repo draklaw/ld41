@@ -62,9 +62,14 @@ unsigned Character::index() const {
 
 
 String Character::name() const {
+	if(isPlayer()) {
+		return "you";
+	}
+
 	if(_node)
 		return cat(teamName(), " ", className(), " ",
 		           _node->characterIndex(shared_from_this()));
+
 	return cat(teamName(), " ", className());
 }
 
@@ -159,7 +164,7 @@ unsigned Character::range() const {
 
 
 bool Character::isAlive() const {
-	return _deathTime == 0;
+	return _hp > 0;
 }
 
 
@@ -188,12 +193,12 @@ void Character::attack(CharacterSP target) {
 	dbgLogger.info(debugName(), " attack ", target->debugName(),
 	               " for ", damage, " damage");
 
-	if(target->isAlive() && node() == _textMoba->player()->node()) {
+	if(node() == _textMoba->player()->node()) {
 		_textMoba->print(name(), " attack ", targetName,
 		                 " for ", damage, " damage");
-	}
-	if(!target->isAlive()) {
-		_textMoba->print(name(), " killed ", targetName);
+		if(!target->isAlive()) {
+			_textMoba->print(name(), " killed ", targetName);
+		}
 	}
 }
 
@@ -201,7 +206,7 @@ void Character::attack(CharacterSP target) {
 void Character::takeDamage(unsigned damage) {
 	if(damage >= hp()) {
 		_hp = 0;
-		_textMoba->destroyCharacter(shared_from_this());
+		_textMoba->killCharacter(shared_from_this());
 	}
 	else {
 		_hp -= damage;

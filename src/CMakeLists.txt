@@ -37,6 +37,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 	character_class.cpp
 	character.cpp
 	ai.cpp
+	redshirt_ai.cpp
 	tm_command.cpp
 	text_moba.cpp
 	commands.cpp

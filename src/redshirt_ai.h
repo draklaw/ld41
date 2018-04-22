@@ -19,26 +19,24 @@
  */
 
 
-#ifndef LD41_AI_H_
-#define LD41_AI_H_
+#ifndef LD41_REDSHIRT_AI_H_
+#define LD41_REDSHIRT_AI_H_
 
 
 #include <lair/core/lair.h>
 
-#include "text_moba.h"
+#include "ai.h"
 
 
-class Ai {
+class RedshirtAi : public Ai {
 public:
-	Ai(CharacterSP character);
-	virtual ~Ai();
+	RedshirtAi(CharacterSP character, Lane lane);
 
-	CharacterSP character() const;
-
-	virtual void play();
+	virtual void play() override;
 
 public:
-	CharacterWP _character;
+	Lane        _lane;
+	CharacterWP _target;
 };
 
 

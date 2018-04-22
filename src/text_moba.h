@@ -104,6 +104,7 @@ public:
 	Console* console();
 
 	MapNodeSP mapNode(const lair::String& id);
+	MapNodeSP fonxus(Team team);
 	CharacterClassSP characterClass(const lair::String& id);
 	CharacterSP player();
 
@@ -112,7 +113,7 @@ public:
 	CharacterSP spawnRedshirt(Team team, Lane lane);
 	void spawnRedshirts(unsigned count);
 
-	void destroyCharacter(CharacterSP character);
+	void killCharacter(CharacterSP character);
 
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void nextTurn();

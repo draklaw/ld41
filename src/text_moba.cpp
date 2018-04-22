@@ -30,6 +30,7 @@
 #include "character_class.h"
 #include "character.h"
 #include "ai.h"
+#include "redshirt_ai.h"
 #include "tm_command.h"
 
 #include "text_moba.h"
@@ -240,6 +241,11 @@ MapNodeSP TextMoba::mapNode(const String& id) {
 }
 
 
+MapNodeSP TextMoba::fonxus(Team team) {
+	return mapNode((team == BLUE)? "bf": "rf");
+}
+
+
 CharacterClassSP TextMoba::characterClass(const lair::String& id) {
 	auto it = _classes.find(id);
 	if(it == _classes.end())
@@ -297,13 +303,20 @@ void TextMoba::spawnRedshirts(unsigned count) {
 }
 
 
-void TextMoba::destroyCharacter(CharacterSP character) {
-	dbgLogger.log("Destroy ", character->debugName());
-	if(character->node()) {
-		character->node()->removeCharacter(character);
-		character->_node = nullptr;
+void TextMoba::killCharacter(CharacterSP character) {
+	dbgLogger.log("Kill ", character->debugName());
+	if(character->cClass()->playable()) {
+		moveCharacter(character, fonxus(character->team()));
+		// TODO: Death & respawn
+		character->_hp = character->maxHP();
 	}
-	_characters.erase(character);
+	else {
+		if(character->node()) {
+			character->node()->removeCharacter(character);
+			character->_node = nullptr;
+		}
+		_characters.erase(character);
+	}
 }
 
 

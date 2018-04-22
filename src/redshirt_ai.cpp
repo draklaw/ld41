@@ -25,26 +25,52 @@
 #include "character_class.h"
 #include "character.h"
 
-#include "ai.h"
+#include "redshirt_ai.h"
 
 
 using namespace lair;
 
 
-Ai::Ai(CharacterSP character)
-    : _character(character)
+RedshirtAi::RedshirtAi(CharacterSP character, Lane lane)
+    : Ai(character)
+    , _lane(lane)
 {
 }
 
 
-Ai::~Ai() {
-}
+void RedshirtAi::play() {
+	CharacterSP c = character();
 
+	if(!c || !c->isAlive())
+		return;
 
-CharacterSP Ai::character() const {
-	return _character.lock();
-}
+	dbgLogger.log(c->debugName(), " turn:");
 
+	Team enemy = c->enemyTeam();
 
-void Ai::play() {
+	CharacterGroups groups = c->node()->characterGroups();
+	if(groups.count(enemy)) {
+		CharacterSP target = _target.lock();
+
+		if(!target || !target->isAlive()) {
+			target = groups.pickClosestEnemy(c);
+		}
+
+		if(target) {
+			_target = target;
+			dbgLogger.info("  Attack ", target->debugName());
+			c->attack(target);
+		}
+	}
+	else {
+		MapNodeSP dest = c->node()->destination((c->team() == BLUE)? "red": "blue");
+		if(!dest) {
+			dest = c->node()->destination((_lane == TOP)? "top": "bot");
+		}
+
+		if(dest) {
+			dbgLogger.info("  Go to ", dest->name());
+			c->moveTo(dest);
+		}
+	}
 }
