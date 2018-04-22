@@ -88,6 +88,7 @@ void HelpCommand::exec(const StringVector& /*args*/) {
 }
 
 
+
 LookCommand::LookCommand(TextMoba* textMoba)
     : TMCommand(textMoba)
 {
@@ -111,7 +112,7 @@ void LookCommand::exec(const StringVector& args) {
 			print("Here, there is");
 			unsigned i = 1;
 			for(CharacterSP c: node->characters()) {
-				if(c != player())
+				if(c == player())
 					continue;
 				print("  ", i, ": a level ", c->level() + 1, " ",
 				      c->teamName(), " ", c->className(), " (",
@@ -121,6 +122,7 @@ void LookCommand::exec(const StringVector& args) {
 		}
 	}
 }
+
 
 
 DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
@@ -139,6 +141,22 @@ void DirectionsCommand::exec(const StringVector& /*args*/) {
 		print("  ", join(pair.second), ": toward ", pair.first->name());
 	}
 }
+
+
+
+WaitCommand::WaitCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+{
+	_names.emplace_back("wait");
+	_names.emplace_back("w");
+
+	_desc = "  Do nothing until next turn.";
+}
+
+void WaitCommand::exec(const StringVector& /*args*/) {
+	_textMoba->nextTurn();
+}
+
 
 
 GoCommand::GoCommand(TextMoba* textMoba)

@@ -40,6 +40,7 @@ Character::Character(TextMoba* textMoba, CharacterClassSP cClass, unsigned index
     , _xp(0)
     , _hp(cClass->maxHP(level))
     , _mana(cClass->maxMana(level))
+    , _deathTime(0)
 {
 }
 
@@ -115,10 +116,20 @@ unsigned Character::mana() const {
 
 
 bool Character::isAlive() const {
-	return _deathTime;
+	return _deathTime == 0;
 }
 
 
 bool Character::deathTime() const {
 	return _deathTime;
+}
+
+
+AiSP Character::ai() const {
+	return _ai;
+}
+
+
+void Character::moveTo(MapNodeSP dest) {
+	_textMoba->moveCharacter(shared_from_this(), dest);
 }

@@ -49,10 +49,16 @@ enum Place {
 	FRONT,
 };
 
+enum Lane {
+	TOP,
+	BOT,
+};
+
 
 class MapNode;
 class CharacterClass;
 class Character;
+class Ai;
 class TMCommand;
 class TextMoba;
 
@@ -60,6 +66,8 @@ typedef std::shared_ptr<MapNode>        MapNodeSP;
 typedef std::weak_ptr<MapNode>          MapNodeWP;
 typedef std::shared_ptr<CharacterClass> CharacterClassSP;
 typedef std::shared_ptr<Character>      CharacterSP;
+typedef std::weak_ptr<Character>        CharacterWP;
+typedef std::shared_ptr<Ai>             AiSP;
 typedef std::shared_ptr<TMCommand>      TMCommandSP;
 
 
@@ -96,6 +104,9 @@ public:
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void nextTurn();
 
+	void spawnRedshirts(unsigned count);
+	CharacterSP spawnRedshirt(Team team, Lane lane);
+
 	const TMCommandList& commands() const;
 	TMCommand* command(const lair::String& name) const;
 
@@ -129,6 +140,14 @@ private:
 	unsigned     _charIndex;
 	CharacterSet _characters;
 	CharacterSP  _player;
+
+public:
+	unsigned _firstWaveTime;
+	unsigned _waveTime;
+	unsigned _redshirtPerLane;
+
+	unsigned _turn;
+	unsigned _nextWaveCounter;
 };
 
 

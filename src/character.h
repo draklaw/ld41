@@ -28,7 +28,7 @@
 #include "text_moba.h"
 
 
-class Character {
+class Character : public std::enable_shared_from_this<Character> {
 public:
 	Character(TextMoba* textMoba, CharacterClassSP cClass, unsigned index,
 	          unsigned level = 0);
@@ -55,6 +55,16 @@ public:
 	bool isAlive() const;
 	bool deathTime() const;
 
+	AiSP ai() const;
+
+	template<typename T, typename... Args>
+	AiSP setAi(Args&&... args) {
+		_ai = std::make_shared<T>(shared_from_this(), std::forward<Args>(args)...);
+		return _ai;
+	}
+
+	void moveTo(MapNodeSP dest);
+
 public:
 	TextMoba* _textMoba;
 
@@ -71,6 +81,8 @@ public:
 	unsigned _mana;
 
 	unsigned _deathTime;
+
+	AiSP     _ai;
 };
 
 

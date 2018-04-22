@@ -73,6 +73,7 @@ void Console::writeLine(const String& line) {
 			_lines.emplace_back(lineBegin, it);
 			if(onAddLine)
 				onAddLine(_lines.back());
+//			dbgLogger.log(_lines.back());
 			lineBegin = it + 1;
 		}
 	}
@@ -80,6 +81,7 @@ void Console::writeLine(const String& line) {
 	_lines.emplace_back(lineBegin, it);
 	if(onAddLine)
 		onAddLine(_lines.back());
+//	dbgLogger.log(_lines.back());
 }
 
 

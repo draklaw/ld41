@@ -19,28 +19,38 @@
  */
 
 
-#ifndef LD41_COMMANDS_H_
-#define LD41_COMMANDS_H_
+#ifndef LD41_AI_H_
+#define LD41_AI_H_
 
 
 #include <lair/core/lair.h>
 
-#include "tm_command.h"
+#include "text_moba.h"
 
 
-#define DECL_COMMAND(_name) \
-	class _name : public TMCommand { \
-	public: \
-	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
-	};
+class Ai {
+public:
+	Ai(CharacterSP character);
+	virtual ~Ai();
+
+	CharacterSP character() const;
+
+	virtual void play();
+
+public:
+	CharacterWP _character;
+};
 
 
-DECL_COMMAND(HelpCommand)
-DECL_COMMAND(LookCommand)
-DECL_COMMAND(DirectionsCommand)
-DECL_COMMAND(WaitCommand)
-DECL_COMMAND(GoCommand)
+class RedshirtAi : public Ai {
+public:
+	RedshirtAi(CharacterSP character, Lane lane);
+
+	virtual void play() override;
+
+public:
+	Lane _lane;
+};
 
 
 #endif

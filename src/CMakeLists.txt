@@ -36,6 +36,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 	map_node.cpp
 	character_class.cpp
 	character.cpp
+	ai.cpp
 	tm_command.cpp
 	text_moba.cpp
 	commands.cpp

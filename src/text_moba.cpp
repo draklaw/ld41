@@ -29,6 +29,7 @@
 #include "map_node.h"
 #include "character_class.h"
 #include "character.h"
+#include "ai.h"
 #include "tm_command.h"
 
 #include "text_moba.h"
@@ -138,11 +139,6 @@ IntVector getClassStats(const Variant& var, const String& key, bool* success = n
 
 
 bool CharacterOrder::operator()(const CharacterSP& c0, const CharacterSP& c1) const {
-	if(c0->isPlayer())
-		return true;
-	if(c1->isPlayer())
-		return false;
-
 	if(c0->team() < c1->team())
 		return true;
 	if(c1->team() < c0->team())
@@ -171,6 +167,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_addCommand<HelpCommand>();
 	_addCommand<LookCommand>();
 	_addCommand<DirectionsCommand>();
+	_addCommand<WaitCommand>();
 	_addCommand<GoCommand>();
 }
 
@@ -239,6 +236,9 @@ CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
 		moveCharacter(character, node);
 	}
 
+	dbgLogger.log("Spawn ", character->teamName(), " ", character->className(),
+	              " ", character->index(), " at ", node? node->name(): "<nowhere>");
+
 	_characters.emplace(character);
 	++_charIndex;
 
@@ -258,7 +258,42 @@ void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 
 
 void TextMoba::nextTurn() {
-	_console->writeLine("Next turn !");
+	_turn += 1;
+
+	for(CharacterSP c: _characters) {
+		if(c->ai()) {
+			c->ai()->play();
+		}
+	}
+
+	_nextWaveCounter -= 1;
+	if(_nextWaveCounter == 0) {
+		_console->writeLine("A new batch of redshirts leave the fonxus.");
+		spawnRedshirts(_redshirtPerLane);
+		_nextWaveCounter = _waveTime;
+	}
+
+	_console->writeLine(cat("End of turn ", _turn));
+	_execCommand("look");
+}
+
+
+void TextMoba::spawnRedshirts(unsigned count) {
+	for(unsigned i = 0; i < count; ++i) {
+		spawnRedshirt(BLUE, TOP);
+		spawnRedshirt(BLUE, BOT);
+		spawnRedshirt(RED,  TOP);
+		spawnRedshirt(RED,  BOT);
+	}
+}
+
+
+CharacterSP TextMoba::spawnRedshirt(Team team, Lane lane) {
+	MapNodeSP fonxus = mapNode((team == BLUE)? "bf": "rf");
+	CharacterSP redshirt = spawnCharacter("redshirt", team, fonxus);
+	redshirt->setAi<RedshirtAi>(lane);
+	dbgLogger.info("  RedshirtAi: ", lane);
+	return redshirt;
 }
 
 
@@ -339,6 +374,10 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	if(motd.isString()) {
 		_console->writeLine(motd.asString());
 	}
+
+	_firstWaveTime   = getInt(config, "first_wave_time");
+	_waveTime        = getInt(config, "wave_time");
+	_redshirtPerLane = getInt(config, "redshirt_per_lane");
 
 	Variant nodes = config.get("nodes");
 	if(nodes.isVarMap()) {
@@ -444,7 +483,15 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		dbgLogger.error("Expected \"classes\" VarMap.");
 	}
 
-	_player = spawnCharacter("warrior", BLUE, mapNode("bf"));
+	// Setup
+
+
+	_turn = 0;
+	_nextWaveCounter = _firstWaveTime;
+
+	// Player *must* have charIndex 0
+	_charIndex = 0;
+	_player = spawnCharacter("ranger", BLUE, mapNode("bf"));
 
 	for(const auto& pair: _nodes) {
 		MapNodeSP node = pair.second;
