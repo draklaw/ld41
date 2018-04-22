@@ -194,45 +194,45 @@ paths = [
 		from = bf
 		to   = btt1
 		from_dirs = [ "top" ]
-		to_dirs   = [ "blue", "fonxus" ]
+		to_dirs   = [ "blue", "back", "fonxus" ]
 	}
 	{
 		from = btt1
 		to   = btl1
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	{
 		from = btl1
 		to   = btt2
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// Bot
 	{
 		from = bf
 		to   = bbt1
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "blue", "fonxus" ]
+		to_dirs   = [ "blue", "back", "fonxus" ]
 	}
 	{
 		from = bbt1
 		to   = bbl1
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	{
 		from = bbl1
 		to   = bbt2
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// Jungle
 	{
 		from = bj1
 		to   = bj2
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// Cross
 	{
@@ -260,45 +260,45 @@ paths = [
 		from = rf
 		to   = rtt1
 		from_dirs = [ "top" ]
-		to_dirs   = [ "red", "fonxus" ]
+		to_dirs   = [ "red", "ahead", "fonxus" ]
 	}
 	{
 		from = rtt1
 		to   = rtl1
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	{
 		from = rtl1
 		to   = rtt2
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	// Bot
 	{
 		from = rf
 		to   = rbt1
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "red", "fonxus" ]
+		to_dirs   = [ "red", "ahead", "fonxus" ]
 	}
 	{
 		from = rbt1
 		to   = rbl1
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	{
 		from = rbl1
 		to   = rbt2
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	// Jungle
 	{
 		from = rj1
 		to   = rj2
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	// Cross
 	{
@@ -325,27 +325,27 @@ paths = [
 	{
 		from = ctl
 		to   = btt2
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	{
 		from = ctl
 		to   = rtt2
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// Bot
 	{
 		from = cbl
 		to   = bbt2
-		from_dirs = [ "blue" ]
-		to_dirs   = [ "red" ]
+		from_dirs = [ "blue", "back" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	{
 		from = cbl
 		to   = rbt2
-		from_dirs = [ "red" ]
-		to_dirs   = [ "blue" ]
+		from_dirs = [ "red", "ahead" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// River
 	{
@@ -371,25 +371,25 @@ paths = [
 		from = bj2
 		to   = ctr
 		from_dirs = [ "top" ]
-		to_dirs   = [ "blue" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	{
 		from = bj2
 		to   = cbr
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "blue" ]
+		to_dirs   = [ "blue", "back" ]
 	}
 	// Red jungle
 	{
 		from = rj2
 		to   = ctr
 		from_dirs = [ "top" ]
-		to_dirs   = [ "red" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 	{
 		from = rj2
 		to   = cbr
 		from_dirs = [ "bot" ]
-		to_dirs   = [ "red" ]
+		to_dirs   = [ "red", "ahead" ]
 	}
 ]
