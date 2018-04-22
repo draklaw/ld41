@@ -30,3 +30,76 @@
 using namespace lair;
 
 
+const String& CharacterClass::id() const {
+	return _id;
+}
+
+
+const String& CharacterClass::name() const {
+	return _name;
+}
+
+
+bool CharacterClass::playable() const {
+	return _playable;
+}
+
+
+const IntVector CharacterClass::maxHP() const {
+	return _maxHP;
+}
+
+
+const IntVector CharacterClass::maxMana() const {
+	return _maxMana;
+}
+
+
+const IntVector CharacterClass::xp() const {
+	return _xp;
+}
+
+
+const IntVector CharacterClass::damage() const {
+	return _damage;
+}
+
+
+const IntVector CharacterClass::range() const {
+	return _range;
+}
+
+
+const IntVector CharacterClass::speed() const {
+	return _speed;
+}
+
+
+int CharacterClass::maxHP(unsigned level) const {
+	return _maxHP.at(level);
+}
+
+
+int CharacterClass::maxMana(unsigned level) const {
+	return _maxMana.at(level);
+}
+
+
+int CharacterClass::xp(unsigned level) const {
+	return _xp.at(level);
+}
+
+
+int CharacterClass::damage(unsigned level) const {
+	return _damage.at(level);
+}
+
+
+int CharacterClass::range(unsigned level) const {
+	return _range.at(level);
+}
+
+
+int CharacterClass::speed(unsigned level) const {
+	return _speed.at(level);
+}

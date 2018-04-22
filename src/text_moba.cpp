@@ -379,17 +379,17 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 			CharacterClassSP cClass = std::make_shared<CharacterClass>();
 
-			cClass->id       = id;
-			cClass->name     = getString(obj, "name", "<fixme_no_name>");
-			cClass->playable = getBool(obj, "playable", false);
-			cClass->maxHP    = getClassStats(obj, "max_hp");
-			cClass->maxMana  = getClassStats(obj, "max_mana");
-			cClass->xp       = getClassStats(obj, "xp");
-			cClass->damage   = getClassStats(obj, "damage");
-			cClass->range    = getClassStats(obj, "range");
-			cClass->speed    = getClassStats(obj, "speed");
+			cClass->_id       = id;
+			cClass->_name     = getString(obj, "name", "<fixme_no_name>");
+			cClass->_playable = getBool(obj, "playable", false);
+			cClass->_maxHP    = getClassStats(obj, "max_hp");
+			cClass->_maxMana  = getClassStats(obj, "max_mana");
+			cClass->_xp       = getClassStats(obj, "xp");
+			cClass->_damage   = getClassStats(obj, "damage");
+			cClass->_range    = getClassStats(obj, "range");
+			cClass->_speed    = getClassStats(obj, "speed");
 
-			_classes.emplace(cClass->id, cClass);
+			_classes.emplace(cClass->id(), cClass);
 		}
 	}
 	else {

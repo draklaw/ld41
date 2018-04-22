@@ -36,8 +36,8 @@ Character::Character(CharacterClassSP cClass, unsigned level)
     , _team(BLUE)
     , _level(level)
     , _xp(0)
-    , _hp(cClass->maxHP[level])
-    , _mana(cClass->maxMana[level])
+    , _hp(cClass->maxHP(level))
+    , _mana(cClass->maxMana(level))
 {
 }
 
@@ -48,7 +48,7 @@ CharacterClassSP Character::cClass() const {
 
 
 const String& Character::className() const {
-	return _cClass->name;
+	return _cClass->name();
 }
 
 
@@ -73,12 +73,12 @@ const String& Character::teamName() const {
 
 
 unsigned Character::maxHP() const {
-	return _cClass->maxHP[_level];
+	return _cClass->maxHP(_level);
 }
 
 
 unsigned Character::maxMana() const {
-	return _cClass->maxMana[_level];
+	return _cClass->maxMana(_level);
 }
 
 

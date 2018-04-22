@@ -30,16 +30,35 @@
 
 class CharacterClass {
 public:
-	lair::String id;
-	lair::String name;
-	bool         playable;
+	const lair::String& id() const;
+	const lair::String& name() const;
+	bool playable() const;
 
-	IntVector    maxHP;
-	IntVector    maxMana;
-	IntVector    xp;
-	IntVector    damage;
-	IntVector    range;
-	IntVector    speed;
+	const IntVector maxHP() const;
+	const IntVector maxMana() const;
+	const IntVector xp() const;
+	const IntVector damage() const;
+	const IntVector range() const;
+	const IntVector speed() const;
+
+	int maxHP(unsigned level) const;
+	int maxMana(unsigned level) const;
+	int xp(unsigned level) const;
+	int damage(unsigned level) const;
+	int range(unsigned level) const;
+	int speed(unsigned level) const;
+
+public:
+	lair::String _id;
+	lair::String _name;
+	bool         _playable;
+
+	IntVector    _maxHP;
+	IntVector    _maxMana;
+	IntVector    _xp;
+	IntVector    _damage;
+	IntVector    _range;
+	IntVector    _speed;
 };
 
 
