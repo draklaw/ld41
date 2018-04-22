@@ -178,6 +178,11 @@ AiSP Character::ai() const {
 }
 
 
+unsigned Character::placeIndex() const {
+	return ::placeIndex(team(), place());
+}
+
+
 void Character::moveTo(MapNodeSP dest) {
 	_textMoba->moveCharacter(shared_from_this(), dest);
 }

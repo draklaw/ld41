@@ -73,6 +73,8 @@ public:
 		return _ai;
 	}
 
+	unsigned placeIndex() const;
+
 	void moveTo(MapNodeSP dest);
 	void attack(CharacterSP target);
 	void takeDamage(unsigned damage);

@@ -40,12 +40,15 @@ public:
 	CharacterSP get(Team team, unsigned index) const;
 	CharacterSP get(Team team, Place place, unsigned index) const;
 
+	unsigned distanceBetween(CharacterSP c0, CharacterSP c1) const;
+
 	CharacterSP pick(Team team, Place place) const;
 	CharacterSP pickClosestEnemy(CharacterSP c, int range = -1) const;
 
 	unsigned _index(unsigned team, unsigned place) const;
 
 public:
+	const MapNode* _node;
 	CharacterVector _characters;
 	unsigned _indices[5];
 };

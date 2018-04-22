@@ -30,7 +30,9 @@
 using namespace lair;
 
 
-CharacterGroups::CharacterGroups(const MapNode* node) {
+CharacterGroups::CharacterGroups(const MapNode* node)
+    : _node(node)
+{
 	_characters.resize(node->_characters.size());
 	std::copy(node->_characters.begin(), node->_characters.end(),
 	          _characters.begin());
@@ -108,8 +110,27 @@ CharacterSP CharacterGroups::get(Team team, Place place, unsigned index) const {
 }
 
 
-unsigned CharacterGroups::_index(unsigned team, unsigned place) const {
-	return _indices[2 * team + place];
+unsigned CharacterGroups::distanceBetween(CharacterSP c0, CharacterSP c1) const {
+	if(!c0->isAlive() || c0->node().get() != _node ||
+	   !c1->isAlive() || c1->node().get() != _node)
+		return 9999;
+
+	int p0 = c0->placeIndex();
+	int p1 = c1->placeIndex();
+
+	if(p0 > p1)
+		std::swap(p0, p1);
+
+	unsigned dist = p1 - p0;
+	for(int i = p0 + 1; i < p0 - 1; ++i) {
+		Team team = teamFromPlaceIndex(i);
+		Place place = placeFromPlaceIndex(i);
+		if(!count(team, place)) {
+			dist -= 1;
+		}
+	}
+
+	return dist;
 }
 
 
@@ -147,6 +168,10 @@ CharacterSP CharacterGroups::pickClosestEnemy(CharacterSP c, int range) const {
 	return CharacterSP();
 }
 
+
+unsigned CharacterGroups::_index(unsigned team, unsigned place) const {
+	return _indices[2 * team + place];
+}
 
 
 

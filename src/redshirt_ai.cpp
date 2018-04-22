@@ -52,7 +52,8 @@ void RedshirtAi::play() {
 	if(groups.count(enemy)) {
 		CharacterSP target = _target.lock();
 
-		if(!target || !target->isAlive()) {
+		if(!target || !target->isAlive() ||
+		        groups.distanceBetween(c, target) > c->range()) {
 			target = groups.pickClosestEnemy(c);
 		}
 

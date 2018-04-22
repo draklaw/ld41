@@ -187,6 +187,24 @@ Team enemyTeam(Team team) {
 }
 
 
+unsigned placeIndex(Team team, Place place) {
+	return (team == BLUE)?
+	            ((place == BACK)?  0: 1):
+	            ((place == FRONT)? 2: 3);
+}
+
+
+Team teamFromPlaceIndex(unsigned pi) {
+	return Team(pi / 2);
+}
+
+
+Place placeFromPlaceIndex(unsigned pi) {
+	Team team = teamFromPlaceIndex(pi);
+	unsigned place = pi & 0x01;
+	return Place((team == BLUE)? place: 1 - place);
+}
+
 
 
 TextMoba::TextMoba(MainState* mainState, Console* console)

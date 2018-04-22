@@ -105,22 +105,15 @@ void LookCommand::exec(const StringVector& args) {
 		MapNodeSP node = player()->node();
 		print("You are at ", node->name(), ".");
 
-		if(node->characters().size() < 2) {
-			print("There is nothing here.");
-		}
-		else {
-			print("Here, there is");
-			unsigned i = 0;
-			for(CharacterSP c: node->characters()) {
-//				if(c == player())
-//					continue;
-				print("  ", i, ": ", c->isPlayer()? "You: ": "",
-				      "[", c->placeName(),
-				      "] a level ", c->level() + 1, " ",
-				      c->teamName(), " ", c->className(), " (",
-				      c->hp(), " / ", c->maxHP(), ")");
-				i += 1;
-			}
+		print("Here, there is");
+		unsigned i = 0;
+		for(CharacterSP c: node->characters()) {
+			print("  ", i, ": ", c->isPlayer()? "You: ": "",
+			      "[", c->placeName(),
+			      "] a level ", c->level() + 1, " ",
+			      c->teamName(), " ", c->className(), " (",
+			      c->hp(), " / ", c->maxHP(), ")");
+			i += 1;
 		}
 	}
 }

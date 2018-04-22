@@ -89,6 +89,9 @@ const lair::String& placeName(Place place);
 const lair::String& laneName(Lane lane);
 
 Team enemyTeam(Team team);
+unsigned placeIndex(Team team, Place place);
+Team teamFromPlaceIndex(unsigned pi);
+Place placeFromPlaceIndex(unsigned pi);
 
 
 class TextMoba {
