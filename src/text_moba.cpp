@@ -158,7 +158,7 @@ bool CharacterOrder::operator()(const CharacterSP& c0, const CharacterSP& c1) co
 
 
 const String& teamName(Team team) {
-	static String names[] = {
+	static const String names[] = {
 	    "blue",
 	    "red",
 	    "neutral",
@@ -167,7 +167,7 @@ const String& teamName(Team team) {
 }
 
 const String& placeName(Place place) {
-	static String names[] = {
+	static const String names[] = {
 	    "back",
 	    "front",
 	};
@@ -175,7 +175,7 @@ const String& placeName(Place place) {
 }
 
 const String& laneName(Lane lane) {
-	static String names[] = {
+	static const String names[] = {
 	    "top",
 	    "bot",
 	};
@@ -304,8 +304,13 @@ CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
 
 
 CharacterSP TextMoba::spawnRedshirt(Team team, Lane lane) {
+	static const String classes[] = {
+	    "blueshirt",
+	    "redshirt",
+	};
+
 	MapNodeSP fonxus = mapNode((team == BLUE)? "bf": "rf");
-	CharacterSP redshirt = spawnCharacter("redshirt", team, fonxus);
+	CharacterSP redshirt = spawnCharacter(classes[team], team, fonxus);
 	redshirt->setAi<RedshirtAi>(lane);
 	dbgLogger.info("  RedshirtAi: ", lane);
 	return redshirt;
@@ -590,6 +595,9 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	for(const auto& pair: _nodes) {
 		MapNodeSP node = pair.second;
 
+		if(node->fonxus().size()) {
+			spawnCharacter("fonxus", (node->fonxus() == "blue")? BLUE: RED, node);
+		}
 		if(node->tower().size()) {
 			spawnCharacter("tower", (node->tower() == "blue")? BLUE: RED, node);
 		}
