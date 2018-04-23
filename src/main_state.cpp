@@ -428,6 +428,19 @@ String skillDesc(CharacterSP c) {
 	return out.str();
 }
 
+String alliesDesc(const CharacterSet& chars) {
+	std::ostringstream out;
+	for(CharacterSP c: chars) {
+		if(c->type() != HERO || c->team() != BLUE || c->isPlayer())
+			continue;
+
+		out << c->className() << " lvl " << c->level() + 1 << "\n"
+		    << " hp:" << std::setw(6) << c->hp() << " / " << c->maxHP() << "\n"
+		    << " mana:" << std::setw(4) << c->mana() << " / " << c->maxMana() << "\n";
+	}
+	return out.str();
+}
+
 void MainState::updateFrame() {
 	// Update
 
@@ -451,15 +464,14 @@ void MainState::updateFrame() {
 	CharacterSP player = _textMoba.player();
 	String stats = cat(
 	    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
-	    "\n",
-	    "hp:   ", std::setw(4), player->hp(),   " / ", player->maxHP(), "\n",
-	    "mana: ", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
-	    "xp:   ", std::setw(4), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
+	    " hp:", std::setw(6), player->hp(),   " / ", player->maxHP(), "\n",
+	    " mana:", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
+	    " xp:", std::setw(6), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
 	    "\n",
 	    "Skills:\n",
 	    skillDesc(player),
 	    "\n",
-	    "TODO: alies info\n"
+	    alliesDesc(_textMoba.characters())
 	);
 	BitmapTextComponent* statsText = _texts.get(_statsText);
 	if(statsText) {
