@@ -28,16 +28,18 @@ classes = {
 		range      = 1
 		sort_index = 0
 		skills     = [ endure ]
+		image      = 'warrior.png'
 	}
 	ranger = {
 		name       = "ranger"
 		type       = hero
-		max_hp     = [  100,  130,  160,  190,  220,  250 ]
+		max_hp     = [  10000,  130,  160,  190,  220,  250 ]
 		max_mana   = [   30,   36,   42,   48,   54,   60 ]
 		damage     = [   15,   19,   23,   27,   31,   34 ]
 		range      = 2
 		sort_index = 0
 		skills     = [ bomb ]
+		image      = 'ranger.png'
 	}
 	mage = {
 		name       = "mage"
@@ -48,6 +50,7 @@ classes = {
 		range      = 2
 		sort_index = 0
 		skills     = [ fireball ]
+		image      = 'mage.png'
 	}
 //	priest = {
 //		name       = "priest"
@@ -68,6 +71,7 @@ classes = {
 		range      = 1
 		sort_index = 1
 		default_place = front
+		image      = 'redshirt.png'
 	}
 	blueshirt = {
 		name       = "blueshirt"
@@ -77,6 +81,7 @@ classes = {
 		range      = 1
 		sort_index = 1
 		default_place = front
+		image      = 'blueshirt.png'
 	}
 
 	// Towers gain level with time.
@@ -170,128 +175,128 @@ nodes = {
 	// Blue side
 	bf = {
 		name = "the blue fonxus"
-		image = 'fonxus.png'
+		images = [ 'blue_fonxus.png' ]
 		position = Vector(35, 240)
 		tower = blue
 		fonxus = blue
 	}
 	btt1 = {
 		name = "the blue top 1st tower"
-		image = 'base_tower.png'
+		images = [ 'blue_base_tower.png', 'blue_base_tower_down.png' ]
 		position = Vector(55, 320)
 		tower = blue
 	}
 	btl1 = {
 		name = "the top lane between the blue 1st and 2nd tower"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(115, 390)
 	}
 	btt2 = {
 		name = "the blue top 2nd tower"
-		image = 'lane_tower.png'
+		images = [ 'blue_lane_tower.png', 'blue_lane_tower_down.png' ]
 		position = Vector(202, 417)
 		tower = blue
 	}
 	bbt1 = {
 		name = "the blue bottom 1st tower"
-		image = 'base_tower.png'
+		images = [ 'blue_base_tower.png', 'blue_base_tower_down.png' ]
 		position = Vector(55, 160)
 		tower = blue
 	}
 	bbl1 = {
 		name = "the bottom lane between the blue 1st and 2nd tower"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(115, 90)
 	}
 	bbt2 = {
 		name = "the blue bottom 2nd tower"
-		image = 'lane_tower.png'
+		images = [ 'blue_lane_tower.png', 'blue_lane_tower_down.png' ]
 		position = Vector(202, 63)
 		tower = blue
 	}
 	bj1 = {
 		name = "the jungle near the 1st blue tower"
-		image = 'jungle.png'
+		images = [ 'jungle.png' ]
 		position = Vector(180, 240)
 	}
 	bj2 = {
 		name = "the jungle near the 2nd blue tower"
-		image = 'jungle.png'
+		images = [ 'jungle.png' ]
 		position = Vector(250, 240)
 	}
 
 	// red side
 	rf = {
 		name = "the red fonxus"
-		image = 'fonxus.png'
+		images = [ 'red_fonxus.png' ]
 		position = Vector(565, 240)
 		tower = red
 		fonxus = red
 	}
 	rtt1 = {
 		name = "the red top 1st tower"
-		image = 'base_tower.png'
+		images = [ 'red_base_tower.png', 'red_base_tower_down.png' ]
 		position = Vector(545, 320)
 		tower = red
 	}
 	rtl1 = {
 		name = "the top lane between the red 1st and 2nd tower"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(485, 390)
 	}
 	rtt2 = {
 		name = "the red top 2nd tower"
-		image = 'lane_tower.png'
+		images = [ 'red_lane_tower.png', 'red_lane_tower_down.png' ]
 		position = Vector(393, 417)
 		tower = red
 	}
 	rbt1 = {
 		name = "the red bottom 1st tower"
-		image = 'base_tower.png'
+		images = [ 'red_base_tower.png', 'red_base_tower_down.png' ]
 		position = Vector(545, 160)
 		tower = red
 	}
 	rbl1 = {
 		name = "the bottom lane between the red 1st and 2nd tower"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(485, 90)
 	}
 	rbt2 = {
 		name = "the red bottom 2nd tower"
-		image = 'lane_tower.png'
+		images = [ 'red_lane_tower.png', 'red_lane_tower_down.png' ]
 		position = Vector(393, 63)
 		tower = red
 	}
 	rj1 = {
 		name = "the jungle near the 1st red tower"
-		image = 'jungle.png'
+		images = [ 'jungle.png' ]
 		position = Vector(420, 240)
 	}
 	rj2 = {
 		name = "the jungle near the 2nd red tower"
-		image = 'jungle.png'
+		images = [ 'jungle.png' ]
 		position = Vector(350, 240)
 	}
 
 	// river
 	ctl = {
 		name = "the top lane between red and blue 2nd towers"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(300, 420)
 	}
 	cbl = {
 		name = "the bottom lane between red and blue 2nd towers"
-		image = 'lane.png'
+		images = [ 'lane.png' ]
 		position = Vector(300, 60)
 	}
 	ctr = {
 		name = "the central river near the top lane"
-		image = 'river.png'
+		images = [ 'river.png' ]
 		position = Vector(300, 325)
 	}
 	cbr = {
 		name = "the central river near the bottom lane"
-		image = 'river.png'
+		images = [ 'river.png' ]
 		position = Vector(300, 155)
 	}
 }

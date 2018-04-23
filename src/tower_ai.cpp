@@ -51,7 +51,6 @@ void TowerAi::play() {
 	if(groups.count(enemy)) {
 		CharacterSP target = _target.lock();
 
-		groups.dump();
 		if(!target || !target->isAlive() ||
 		        groups.distanceBetween(c, target) > c->range()) {
 			target = groups.pickClosestEnemy(c);

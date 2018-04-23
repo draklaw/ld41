@@ -160,6 +160,7 @@ public:
 	MapCharMap  _mapCharMap;
 
 	EntityRef   _models;
+	EntityRef   _charModel;
 	EntityRef   _mapIconModel;
 
 	EntityRef   _scene;

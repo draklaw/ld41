@@ -749,11 +749,10 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			else
 				dbgLogger.error("Node without name");
 
-			const Variant& imageVar = obj.get("image");
-			if(imageVar.isString())
-				node->_image = imageVar.asString();
-			else
-				dbgLogger.error("Node without image");
+			node->_images = getStringList(obj, "images");
+			for(const String& img: node->_images) {
+				_mainState->loader()->load<ImageLoader>(img);
+			}
 
 			const Variant& posVar = obj.get("position");
 			if(posVar.isVarList() && posVar.asVarList().size() == 2) {
@@ -845,6 +844,11 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			cClass->_range     = getClassStats(obj, "range");
 			cClass->_skills    = getStringList(obj, "skills");
 
+			cClass->_image     = getString(obj, "image");
+			if(cClass->_image.size()) {
+				_mainState->loader()->load<ImageLoader>(cClass->_image);
+			}
+
 			_classes.emplace(cClass->id(), cClass);
 		}
 	}
@@ -932,7 +936,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 	// Player *must* have charIndex 0
 	_charIndex = 0;
-	_player = spawnCharacter("mage", BLUE, mapNode("bf"));
+	_player = spawnCharacter("ranger", BLUE, mapNode("bf"));
 	_heroes.push_back(_player);
 
 	_heroes.push_back(spawnCharacter("warrior", BLUE, mapNode("bf")));

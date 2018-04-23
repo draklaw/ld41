@@ -75,6 +75,11 @@ const IntVector& CharacterClass::range() const {
 }
 
 
+const lair::String& CharacterClass::image() const {
+	return _image;
+}
+
+
 const StringVector& CharacterClass::skills() const {
 	return _skills;
 }

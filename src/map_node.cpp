@@ -233,8 +233,12 @@ MapNodeSP MapNode::destination(const String& direction) const {
 }
 
 
-const Path& MapNode::image() const {
-	return _image;
+const String& MapNode::image() const {
+	for(CharacterSP c: _characters) {
+		if(c->cClass()->id() == "tower")
+			return _images.front();
+	}
+	return _images.back();
 }
 
 

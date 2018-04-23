@@ -42,6 +42,8 @@ public:
 	const IntVector& damage() const;
 	const IntVector& range() const;
 
+	const lair::String& image() const;
+
 	const StringVector& skills() const;
 
 	int maxHP(unsigned level) const;
@@ -62,6 +64,8 @@ public:
 	IntVector    _damage;
 	IntVector    _range;
 	IntVector    _speed;
+
+	lair::String _image;
 
 	StringVector _skills;
 };

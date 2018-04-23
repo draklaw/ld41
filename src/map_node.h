@@ -68,7 +68,7 @@ public:
 	const NodeMap& paths() const;
 	MapNodeSP destination(const lair::String& direction) const;
 
-	const lair::Path& image() const;
+	const lair::String& image() const;
 	const lair::Vector2& pos() const;
 
 	const lair::String& tower() const;
@@ -87,7 +87,7 @@ public:
 	lair::String  _id;
 	lair::String  _name;
 	NodeMap       _paths;
-	lair::Path    _image;
+	StringVector  _images;
 	lair::Vector2 _pos;
 	lair::String  _tower;
 	lair::String  _fonxus;

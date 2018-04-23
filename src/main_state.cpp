@@ -41,7 +41,9 @@
 const float TICK_LENGTH_IN_SEC = 1.f / float(TICKS_PER_SEC);
 
 void dumpEntityTree(Logger& log, EntityRef e, unsigned indent = 0) {
-	log.info(std::string(indent * 2u, ' '), e.name(), ": ", e.isEnabled(), ", ", e.position3().transpose());
+	log.info(std::string(indent * 2u, ' '), e.name(), ": ", e.isEnabled(), ", ",
+	         fmt(e.position3()), " -> ", fmt(e.worldTransform().translation()),
+	         " / ", fmt(e.computeWorldTransform().translation()));
 	EntityRef c = e.firstChild();
 	while(c.isValid()) {
 		dumpEntityTree(log, c, indent + 1);
@@ -135,6 +137,7 @@ void MainState::initialize() {
 	loadEntities("entities.ldl", _entities.root());
 
 	_models       = _entities.findByName("__models__");
+	_charModel    = _entities.findByName("char");
 	_mapIconModel = _entities.findByName("map_icon", _models);
 
 	_scene        = _entities.findByName("scene");
@@ -226,7 +229,6 @@ void MainState::addMapIcon(CharacterSP character) {
 
 	EntityRef e = _entities.cloneEntity(_mapIconModel, _map);
 	e.placeAt(character->node()->pos());
-	e.updateWorldTransformRec();
 
 	SpriteComponent* s = _sprites.get(e);
 	s->setTileIndex(index);
@@ -476,6 +478,43 @@ void MainState::updateFrame() {
 	BitmapTextComponent* statsText = _texts.get(_statsText);
 	if(statsText) {
 		statsText->setText(stats);
+	}
+
+
+	SpriteComponent* view = _sprites.get(_view);
+	view->setEnabled(player->isAlive());
+	if(player->isAlive()) {
+		view->setTexture(player->node()->image());
+	}
+
+	while(_view.firstChild().isValid()) {
+		_view.firstChild().destroy();
+	}
+	if(player->isAlive() && player->node()) {
+		CharacterVector viewChars;
+		for(CharacterSP c: player->node()->characters()) {
+			if(c->team() == RED && c->type() != BUILDING) {
+				viewChars.push_back(c);
+			}
+		}
+		const float margin = 120;
+		unsigned index = 0;
+		for(CharacterSP c: viewChars) {
+			float x = 960 / 2;
+			if(viewChars.size() > 1) {
+				x = margin
+				  + index / float(viewChars.size() - 1) * (960 - 2 * margin);
+			}
+
+			EntityRef e = _entities.cloneEntity(_charModel, _view);
+			e.placeAt(Vector2(x, 50));
+			index += 1;
+
+			SpriteComponent* s = _sprites.get(e);
+			s->setTexture(c->cClass()->image());
+		}
+
+		dumpEntityTree(log(), _scene);
 	}
 
 
