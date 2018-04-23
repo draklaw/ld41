@@ -54,6 +54,12 @@ enum Lane {
 	BOT,
 };
 
+enum CharType {
+	HERO,
+	REDSHIRT,
+	BUILDING,
+};
+
 
 class MapNode;
 class CharacterClass;
@@ -87,6 +93,7 @@ typedef std::set<CharacterSP, CharacterOrder> CharacterSet;
 const lair::String& teamName(Team team);
 const lair::String& placeName(Place place);
 const lair::String& laneName(Lane lane);
+const lair::String& charTypeName(CharType charType);
 
 Team enemyTeam(Team team);
 unsigned placeIndex(Team team, Place place);
@@ -116,10 +123,13 @@ public:
 	CharacterSP spawnRedshirt(Team team, Lane lane);
 	void spawnRedshirts(unsigned count);
 
-	void killCharacter(CharacterSP character);
+	void killCharacter(CharacterSP character, CharacterSP attacker = nullptr);
 
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void placeCharacter(CharacterSP character, Place place);
+	void attack(CharacterSP attacker, CharacterSP target);
+	void dealDamage(CharacterSP target, unsigned damage,
+	                CharacterSP attacker = nullptr);
 	void nextTurn();
 
 	const TMCommandList& commands() const;

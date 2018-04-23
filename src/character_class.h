@@ -33,8 +33,7 @@ public:
 	const lair::String& id() const;
 	const lair::String& name() const;
 	int sortIndex() const;
-	bool playable() const;
-	bool building() const;
+	CharType type() const;
 
 	Place defaultPlace() const;
 
@@ -56,8 +55,7 @@ public:
 	lair::String _id;
 	lair::String _name;
 	int          _sortIndex;
-	bool         _playable;
-	bool         _building;
+	CharType     _type;
 
 	Place        _defaultPlace;
 

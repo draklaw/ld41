@@ -61,6 +61,11 @@ unsigned Character::index() const {
 }
 
 
+CharType Character::type() const {
+	return _cClass->type();
+}
+
+
 String Character::name(bool showIndex) const {
 	if(isPlayer()) {
 		return "you";
@@ -190,31 +195,10 @@ void Character::moveTo(MapNodeSP dest) {
 
 
 void Character::attack(CharacterSP target) {
-	// Save this because it won't be available if target is dead.
-	String targetName = target->name();
-
-	unsigned damage = this->damage();
-	target->takeDamage(damage);
-
-	dbgLogger.info(debugName(), " attack ", target->debugName(),
-	               " for ", damage, " damage");
-
-	if(node() == _textMoba->player()->node()) {
-		_textMoba->print(name(), " attack ", targetName,
-		                 " for ", damage, " damage");
-		if(!target->isAlive()) {
-			_textMoba->print(name(), " killed ", targetName);
-		}
-	}
+	_textMoba->attack(shared_from_this(), target);
 }
 
 
-void Character::takeDamage(unsigned damage) {
-	if(damage >= hp()) {
-		_hp = 0;
-		_textMoba->killCharacter(shared_from_this());
-	}
-	else {
-		_hp -= damage;
-	}
+void Character::takeDamage(unsigned damage, CharacterSP attacker) {
+	_textMoba->dealDamage(shared_from_this(), damage, attacker);
 }

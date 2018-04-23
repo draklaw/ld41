@@ -38,6 +38,8 @@ public:
 
 	unsigned index() const;
 
+	CharType type() const;
+
 	lair::String name(bool showIndex = true) const;
 	lair::String debugName() const;
 	lair::String shortDesc() const;
@@ -77,7 +79,7 @@ public:
 
 	void moveTo(MapNodeSP dest);
 	void attack(CharacterSP target);
-	void takeDamage(unsigned damage);
+	void takeDamage(unsigned damage, CharacterSP attacker = nullptr);
 
 public:
 	TextMoba* _textMoba;

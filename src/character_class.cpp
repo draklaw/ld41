@@ -45,13 +45,8 @@ int CharacterClass::sortIndex() const {
 }
 
 
-bool CharacterClass::playable() const {
-	return _playable;
-}
-
-
-bool CharacterClass::building() const {
-	return _building;
+CharType CharacterClass::type() const {
+	return _type;
 }
 
 

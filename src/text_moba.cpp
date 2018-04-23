@@ -183,6 +183,16 @@ const String& laneName(Lane lane) {
 	return names[lane];
 }
 
+const lair::String& charTypeName(CharType charType) {
+	static const String names[] = {
+	    "hero",
+	    "redshirt",
+	    "building",
+	};
+	return names[charType];
+}
+
+
 Team enemyTeam(Team team) {
 	return Team(team ^ 0x01);
 }
@@ -329,9 +339,23 @@ void TextMoba::spawnRedshirts(unsigned count) {
 }
 
 
-void TextMoba::killCharacter(CharacterSP character) {
-	dbgLogger.log("Kill ", character->debugName());
-	if(character->cClass()->playable()) {
+void TextMoba::killCharacter(CharacterSP character, CharacterSP attacker) {
+	bool printMessage = character->type() == HERO
+	                 || character->node() == player()->node();
+	if(attacker) {
+		dbgLogger.log(attacker->name(), " killed ", character->name(), ".");
+		if(printMessage) {
+			print(attacker->name(), " killed ", character->name(), ".");
+		}
+	}
+	else {
+		dbgLogger.log(character->debugName(), " killed.");
+		if(printMessage) {
+			print(character->name(), " killed.");
+		}
+	}
+
+	if(character->type() == HERO) {
 		moveCharacter(character, fonxus(character->team()));
 		// TODO: Death & respawn
 		character->_hp = character->maxHP();
@@ -348,7 +372,7 @@ void TextMoba::killCharacter(CharacterSP character) {
 
 void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 	if(player() && character != player() && player()->isAlive()
-	        && !character->cClass()->building()
+	        && character->type() != BUILDING
 	        && character->node() == player()->node()) {
 		print(character->name(), " leaves the area.");
 	}
@@ -361,7 +385,7 @@ void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 	character->_place = character->cClass()->defaultPlace();
 
 	if(player() && character != player() && player()->isAlive()
-	        && !character->cClass()->building()
+	        && character->type() != BUILDING
 	        && character->node() == player()->node()) {
 		print(character->name(false), " enters the area.");
 	}
@@ -378,6 +402,32 @@ void TextMoba::placeCharacter(CharacterSP character, Place place) {
 	    print(character->name(), " moves to the ", placeName(place), " row.");
 //	}
 	character->_place = place;
+}
+
+
+void TextMoba::attack(CharacterSP attacker, CharacterSP target) {
+	unsigned damage = attacker->damage();
+
+	dbgLogger.log(attacker->debugName(), " attack ", target->debugName(),
+	              " for ", damage, " damage.");
+
+	if(attacker->node() == player()->node()) {
+		print(attacker->name(), " attack ", target->name(), " for ",
+		      damage, " damage.");
+	}
+
+	dealDamage(target, damage, attacker);
+}
+
+
+void TextMoba::dealDamage(CharacterSP target, unsigned damage, CharacterSP attacker) {
+	if(damage >= target->hp()) {
+		target->_hp = 0;
+		killCharacter(target, attacker);
+	}
+	else {
+		target->_hp -= damage;
+	}
 }
 
 
@@ -571,10 +621,21 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			CharacterClassSP cClass = std::make_shared<CharacterClass>();
 
 			cClass->_id        = id;
+
+			String type = getString(obj, "type");
+			if(type == "hero")
+				cClass->_type = HERO;
+			else if(type == "redshirt")
+				cClass->_type = REDSHIRT;
+			else if(type == "building")
+				cClass->_type = BUILDING;
+			else {
+				dbgLogger.error("Unexpected CharType: \"", type, "\"");
+				cClass->_type = BUILDING;
+			}
+
 			cClass->_name      = getString(obj, "name", "<fixme_no_name>");
 			cClass->_sortIndex = getInt(obj, "sort_index", 9999);
-			cClass->_playable  = getBool(obj, "playable", false);
-			cClass->_building  = getBool(obj, "building", false);
 
 			String defaultPlace = getString(obj, "default_place", "back");
 			cClass->_defaultPlace = (defaultPlace == "back")? BACK: FRONT;
