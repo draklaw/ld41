@@ -74,7 +74,7 @@ public:
 	unsigned range() const;
 
 	bool isAlive() const;
-	bool deathTime() const;
+	unsigned deathTime() const;
 
 	const SkillVector& skills();
 	SkillSP skill(const lair::String& name);

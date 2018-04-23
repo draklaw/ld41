@@ -419,10 +419,16 @@ void MainState::updateTick() {
 }
 
 
+String hpDesc(CharacterSP c) {
+	if(c->isAlive())
+		return cat(std::setw(6), c->hp(), " / ", c->maxHP());
+	return cat("  DEAD (", c->deathTime(), "t)");
+}
+
 String skillDesc(CharacterSP c) {
 	std::ostringstream out;
 	for(SkillSP skill: c->skills()) {
-		out << skill->name() << ": " << skill->manaCost() << " mp";
+		out << skill->name() << " " << skill->manaCost() << "mp";
 		if(skill->timeBeforeNextUse())
 			out << " (" << skill->timeBeforeNextUse() << "t)";
 		out << "\n";
@@ -437,7 +443,7 @@ String alliesDesc(const CharacterSet& chars) {
 			continue;
 
 		out << c->className() << " lvl " << c->level() + 1 << "\n"
-		    << " hp:" << std::setw(6) << c->hp() << " / " << c->maxHP() << "\n"
+		    << " hp:" << hpDesc(c) << "\n"
 		    << " mana:" << std::setw(4) << c->mana() << " / " << c->maxMana() << "\n";
 	}
 	return out.str();
@@ -468,7 +474,7 @@ void MainState::updateFrame() {
 	if(player) {
 		stats = cat(
 		    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
-		    " hp:", std::setw(6), player->hp(),   " / ", player->maxHP(), "\n",
+		    " hp:", hpDesc(player), "\n",
 		    " mana:", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
 		    " xp:", std::setw(6), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
 		    "\n",

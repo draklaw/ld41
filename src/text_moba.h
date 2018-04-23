@@ -216,6 +216,8 @@ public:
 	IntVector _redshirtXpWorth;
 	IntVector _towerXpWorth;
 
+	IntVector _respawnTime;
+
 	unsigned _turn;
 	unsigned _nextWaveCounter;
 

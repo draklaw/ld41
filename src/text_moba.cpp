@@ -465,13 +465,16 @@ void TextMoba::killCharacter(CharacterSP character, CharacterSP attacker) {
 
 	if(character->type() == HERO) {
 		moveCharacter(character, fonxus(character->team()));
-		// TODO: Death & respawn
-		character->_hp = character->maxHP();
+
+		moveCharacter(character, nullptr);
+		// +1 because it will be decremented almost instantly.
+		character->_deathTime = _respawnTime[character->_level] + 1;
+		dbgLogger.error(character->debugName(), " death time ", character->deathTime());
 	}
 	else {
 		if(character->node()) {
 			character->node()->removeCharacter(character);
-			character->_node = nullptr;
+			moveCharacter(character, nullptr);
 		}
 		_characters.erase(character);
 	}
@@ -703,6 +706,17 @@ void TextMoba::nextTurn() {
 
 
 void TextMoba::nextTurn(CharacterSP character) {
+	if(character->deathTime()) {
+		character->_deathTime -= 1;
+		dbgLogger.warning(character->debugName(), " death time: ", character->deathTime());
+		if(character->deathTime() == 0) {
+			character->_hp   = character->maxHP();
+			character->_mana = character->maxMana();
+			moveCharacter(character, fonxus(character->team()));
+		}
+		return;
+	}
+
 	// Fonxus regen
 	if(character->type() == BUILDING) {
 		for(SkillSP s: character->skills()) {
@@ -941,6 +955,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	_heroXpWorth     = getClassStats(config, "hero_xp_worth");
 	_redshirtXpWorth = getClassStats(config, "redshirt_xp_worth");
 	_towerXpWorth    = getClassStats(config, "tower_xp_worth");
+
+	_respawnTime = getClassStats(config, "respawn_time");
 
 	const Variant& nodes = config.get("nodes");
 	if(nodes.isVarMap()) {

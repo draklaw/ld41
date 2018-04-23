@@ -180,7 +180,7 @@ bool Character::isAlive() const {
 }
 
 
-bool Character::deathTime() const {
+unsigned Character::deathTime() const {
 	return _deathTime;
 }
 

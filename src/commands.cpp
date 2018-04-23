@@ -105,7 +105,7 @@ LookCommand::LookCommand(TextMoba* textMoba)
 
 bool LookCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 
@@ -143,7 +143,7 @@ DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
 
 bool DirectionsCommand::exec(const StringVector& /*args*/) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 
@@ -184,7 +184,7 @@ GoCommand::GoCommand(TextMoba* textMoba)
 
 bool GoCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 
@@ -223,7 +223,7 @@ MoveCommand::MoveCommand(TextMoba* textMoba)
 
 bool MoveCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 
@@ -260,7 +260,7 @@ AttackCommand::AttackCommand(TextMoba* textMoba)
 
 bool AttackCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 
@@ -320,7 +320,7 @@ UseCommand::UseCommand(TextMoba* textMoba)
 
 bool UseCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
-		print("You are dead...");
+		print("You are dead... Please use the command \"wait\" until you respawn.");
 		return true;
 	}
 

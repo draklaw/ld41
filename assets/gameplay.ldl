@@ -17,6 +17,8 @@ hero_xp_worth     = [  200,  250,  300,  350,  400,  450 ]
 redshirt_xp_worth = [   50,   65,   80,   95,  110,  125 ]
 tower_xp_worth    = [  200,  250,  300,  350,  400,  450 ]
 
+respawn_time = [ 2, 4, 5, 6, 7, 8 ]
+
 classes = {
 	// Each character has 6 levels.
 	warrior = {
