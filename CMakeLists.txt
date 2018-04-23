@@ -1,7 +1,7 @@
 ##
-##  Copyright (C) 2015-2017 Simon Boyé
+##  Copyright (C) 2015-2018 Simon Boyé
 ##
-##  This file is part of lair.
+##  This file is part of ld41.
 ##
 ##  lair is free software: you can redistribute it and/or modify it
 ##  under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 cmake_minimum_required(VERSION 2.8.12.1)
 
-project(ld41)
+project(league_of_adventure)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
