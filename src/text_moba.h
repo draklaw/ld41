@@ -130,6 +130,7 @@ public:
 	MapNodeSP mapNode(const lair::String& id);
 	MapNodeSP fonxus(Team team);
 	CharacterClassSP characterClass(const lair::String& id);
+	const CharacterSet& characters() const;
 	CharacterSP player();
 	SkillModelSP skillModel(const lair::String id);
 

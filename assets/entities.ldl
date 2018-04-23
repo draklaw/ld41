@@ -1,6 +1,17 @@
 __models__ = {
 	enabled = false
 	children = {
+		map_icon = {
+			transform = translate(0, 0, 0.1)
+			sprite = {
+				texture = Texture(sprite_color, 'map_icons.png', Sampler('bilinear_no_mipmap|clamp'))
+				tile_grid = Vector(3, 2)
+				tile_index = 0
+				anchor = Vector(0.5, 0.5)
+				color = Vector(1, 1, 1)
+				blend = alpha
+			}
+		}
 	}
 }
 

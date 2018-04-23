@@ -28,7 +28,9 @@
 #include "splash_state.h"
 
 #include "map_node.h"
+#include "character_class.h"
 #include "character.h"
+#include "skill.h"
 
 #include "main_state.h"
 
@@ -132,13 +134,15 @@ void MainState::initialize() {
 
 	loadEntities("entities.ldl", _entities.root());
 
-	_models      = _entities.findByName("__models__");
-	_scene       = _entities.findByName("scene");
-	_view        = _entities.findByName("fp_view");
-	_map         = _entities.findByName("map");
-	_statsText   = _entities.findByName("stats_text");
-	_text        = _entities.findByName("text");
-	_cursor      = _entities.findByName("cursor");
+	_models       = _entities.findByName("__models__");
+	_mapIconModel = _entities.findByName("map_icon", _models);
+
+	_scene        = _entities.findByName("scene");
+	_view         = _entities.findByName("fp_view");
+	_map          = _entities.findByName("map");
+	_statsText    = _entities.findByName("stats_text");
+	_text         = _entities.findByName("text");
+	_cursor       = _entities.findByName("cursor");
 
 //	loadSound("kittendeath.wav");
 
@@ -188,6 +192,49 @@ void MainState::run() {
 	_loop.stop();
 
 	stopGame();
+}
+
+
+void MainState::quit() {
+	_running = false;
+}
+
+
+Game* MainState::game() {
+	return static_cast<Game*>(_game);
+}
+
+
+void MainState::addMapIcon(CharacterSP character) {
+	if(!character->isAlive() || !character->node())
+		return;
+
+	unsigned index = 5;
+	if(character->type() == REDSHIRT)
+		index = 4;
+	else if(character->cClass()->id() == "tower")
+		index = 3;
+	else if(character->cClass()->id() == "ranger")
+		index = 0;
+	else if(character->cClass()->id() == "warrior")
+		index = 1;
+	else if(character->cClass()->id() == "mage")
+		index = 2;
+
+	if(index == 5)
+		return;
+
+	EntityRef e = _entities.cloneEntity(_mapIconModel, _map);
+	e.placeAt(character->node()->pos());
+	e.updateWorldTransformRec();
+
+	SpriteComponent* s = _sprites.get(e);
+	s->setTileIndex(index);
+	s->setColor((character->team() == BLUE)?
+	                Vector4(.2, .2, .8, 1):
+	                Vector4(.8, .2, .2, 1));
+
+	_mapCharMap[character->node().get()].push_back(e);
 }
 
 
@@ -273,16 +320,6 @@ int MainState::exec(int argc, const char** argv, EntityRef self) {
 		return -1;
 	}
 	return cmd->second(this, self, argc, argv);
-}
-
-
-void MainState::quit() {
-	_running = false;
-}
-
-
-Game* MainState::game() {
-	return static_cast<Game*>(_game);
 }
 
 
@@ -380,6 +417,30 @@ void MainState::updateTick() {
 }
 
 
+String skillDesc(CharacterSP c) {
+	std::ostringstream out;
+	for(SkillSP skill: c->skills()) {
+		out << skill->name() << ": " << skill->manaCost() << " mp";
+		if(skill->timeBeforeNextUse())
+			out << " (" << skill->timeBeforeNextUse() << "t)";
+		out << "\n";
+	}
+	return out.str();
+}
+
+String alliesDesc(const CharacterSet& chars) {
+	std::ostringstream out;
+	for(CharacterSP c: chars) {
+		if(c->type() != HERO || c->team() != BLUE || c->isPlayer())
+			continue;
+
+		out << c->className() << " lvl " << c->level() + 1 << "\n"
+		    << " hp:" << std::setw(6) << c->hp() << " / " << c->maxHP() << "\n"
+		    << " mana:" << std::setw(4) << c->mana() << " / " << c->maxMana() << "\n";
+	}
+	return out.str();
+}
+
 void MainState::updateFrame() {
 	// Update
 
@@ -403,20 +464,45 @@ void MainState::updateFrame() {
 	CharacterSP player = _textMoba.player();
 	String stats = cat(
 	    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
+	    " hp:", std::setw(6), player->hp(),   " / ", player->maxHP(), "\n",
+	    " mana:", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
+	    " xp:", std::setw(6), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
 	    "\n",
-	    "hp:   ", std::setw(4), player->hp(),   " / ", player->maxHP(), "\n",
-	    "mana: ", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
-	    "xp:   ", std::setw(4), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
+	    "Skills:\n",
+	    skillDesc(player),
 	    "\n",
-//	    "at ", player->node()->name(), "\n",
-//	    "\n"
-	    "Skills stats\n"
-	    "\n",
-	    "TODO: alies info\n"
+	    alliesDesc(_textMoba.characters())
 	);
 	BitmapTextComponent* statsText = _texts.get(_statsText);
 	if(statsText) {
 		statsText->setText(stats);
+	}
+
+
+	_mapCharMap.clear();
+	while(_map.firstChild().isValid()) {
+		_map.firstChild().destroy();
+	}
+	for(CharacterSP c: _textMoba.characters()) {
+		addMapIcon(c);
+	}
+
+	const float offset = 16;
+	for(const auto& pair: _mapCharMap) {
+		const EntityVector& entities = pair.second;
+
+		if(entities.size() < 2)
+			continue;
+
+		int width = std::ceil(std::sqrt(entities.size()));
+		int height = (entities.size() - 1) / width + 1;
+		Vector2 base = entities[0].position2() - Vector2(width - 1, -height + 1) * offset / 2;
+
+		int i = 0;
+		for(EntityRef e: entities) {
+			e.placeAt(Vector2(base + Vector2(i % width, -i / width) * offset));
+			i += 1;
+		}
 	}
 
 

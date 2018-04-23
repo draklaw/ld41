@@ -171,128 +171,128 @@ nodes = {
 	bf = {
 		name = "the blue fonxus"
 		image = 'fonxus.png'
-		position = Vector(30, 450)
+		position = Vector(35, 240)
 		tower = blue
 		fonxus = blue
 	}
 	btt1 = {
 		name = "the blue top 1st tower"
 		image = 'base_tower.png'
-		position = Vector(35, 358)
+		position = Vector(55, 320)
 		tower = blue
 	}
 	btl1 = {
 		name = "the top lane between the blue 1st and 2nd tower"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(115, 390)
 	}
 	btt2 = {
 		name = "the blue top 2nd tower"
 		image = 'lane_tower.png'
-		position = Vector(35, 358)
+		position = Vector(202, 417)
 		tower = blue
 	}
 	bbt1 = {
 		name = "the blue bottom 1st tower"
 		image = 'base_tower.png'
-		position = Vector(35, 358)
+		position = Vector(55, 160)
 		tower = blue
 	}
 	bbl1 = {
 		name = "the bottom lane between the blue 1st and 2nd tower"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(115, 90)
 	}
 	bbt2 = {
 		name = "the blue bottom 2nd tower"
 		image = 'lane_tower.png'
-		position = Vector(35, 358)
+		position = Vector(202, 63)
 		tower = blue
 	}
 	bj1 = {
 		name = "the jungle near the 1st blue tower"
 		image = 'jungle.png'
-		position = Vector(35, 358)
+		position = Vector(180, 240)
 	}
 	bj2 = {
 		name = "the jungle near the 2nd blue tower"
 		image = 'jungle.png'
-		position = Vector(35, 358)
+		position = Vector(250, 240)
 	}
 
 	// red side
 	rf = {
 		name = "the red fonxus"
 		image = 'fonxus.png'
-		position = Vector(30, 450)
+		position = Vector(565, 240)
 		tower = red
 		fonxus = red
 	}
 	rtt1 = {
 		name = "the red top 1st tower"
 		image = 'base_tower.png'
-		position = Vector(35, 358)
+		position = Vector(545, 320)
 		tower = red
 	}
 	rtl1 = {
 		name = "the top lane between the red 1st and 2nd tower"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(485, 390)
 	}
 	rtt2 = {
 		name = "the red top 2nd tower"
 		image = 'lane_tower.png'
-		position = Vector(35, 358)
+		position = Vector(393, 417)
 		tower = red
 	}
 	rbt1 = {
 		name = "the red bottom 1st tower"
 		image = 'base_tower.png'
-		position = Vector(35, 358)
+		position = Vector(545, 160)
 		tower = red
 	}
 	rbl1 = {
 		name = "the bottom lane between the red 1st and 2nd tower"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(485, 90)
 	}
 	rbt2 = {
 		name = "the red bottom 2nd tower"
 		image = 'lane_tower.png'
-		position = Vector(35, 358)
+		position = Vector(393, 63)
 		tower = red
 	}
 	rj1 = {
 		name = "the jungle near the 1st red tower"
 		image = 'jungle.png'
-		position = Vector(35, 358)
+		position = Vector(420, 240)
 	}
 	rj2 = {
 		name = "the jungle near the 2nd red tower"
 		image = 'jungle.png'
-		position = Vector(35, 358)
+		position = Vector(350, 240)
 	}
 
 	// river
 	ctl = {
 		name = "the top lane between red and blue 2nd towers"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(300, 420)
 	}
 	cbl = {
 		name = "the bottom lane between red and blue 2nd towers"
 		image = 'lane.png'
-		position = Vector(35, 358)
+		position = Vector(300, 60)
 	}
 	ctr = {
 		name = "the central river near the top lane"
 		image = 'river.png'
-		position = Vector(35, 358)
+		position = Vector(300, 325)
 	}
 	cbr = {
 		name = "the central river near the bottom lane"
 		image = 'river.png'
-		position = Vector(35, 358)
+		position = Vector(300, 155)
 	}
 }
 

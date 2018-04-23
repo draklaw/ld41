@@ -69,6 +69,10 @@ struct CommandExpr {
 typedef std::deque<CommandExpr> CommandList;
 
 
+typedef std::vector<EntityRef> EntityVector;
+typedef std::unordered_map<MapNode*, EntityVector> MapCharMap;
+
+
 class MainState : public GameState {
 public:
 	MainState(Game* game);
@@ -81,6 +85,8 @@ public:
 	virtual void quit();
 
 	Game* game();
+
+	void addMapIcon(CharacterSP character);
 
 	void exec(const std::string& cmd, EntityRef self = EntityRef());
 	void exec(const CommandList& commands);
@@ -151,10 +157,12 @@ public:
 	Input*      _okInput;
 
 	TextMoba    _textMoba;
+	MapCharMap  _mapCharMap;
 
 	EntityRef   _models;
-	EntityRef   _scene;
+	EntityRef   _mapIconModel;
 
+	EntityRef   _scene;
 	EntityRef   _view;
 	EntityRef   _map;
 	EntityRef   _statsText;

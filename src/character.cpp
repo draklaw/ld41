@@ -72,12 +72,17 @@ String Character::name(bool showIndex) const {
 		return "you";
 	}
 
-	if(showIndex && _node) {
-		return cat(teamName(), " ", className(), " ",
-		           _node->characterIndex(shared_from_this()));
-	}
+	std::ostringstream out;
 
-	return cat(teamName(), " ", className());
+	if(type() != REDSHIRT)
+		out << teamName() << " ";
+
+	out << className();
+
+	if(showIndex && _node)
+		out << " " << _node->characterIndex(shared_from_this());
+
+	return out.str();
 }
 
 
