@@ -341,7 +341,7 @@ void UseCommand::exec(const StringVector& args) {
 				charIndex = std::stoi(args[2]);
 			}
 			catch(std::invalid_argument) {
-				print("I don't understand who you try to attack.");
+				print("I don't understand who you're trying to attack.");
 				return;
 			}
 
@@ -352,7 +352,7 @@ void UseCommand::exec(const StringVector& args) {
 				return;
 			}
 
-			if(target->team() == skill->targetTeam()) {
+			if(target->team() != skill->targetTeam()) {
 				print("Target is in the wrong team.");
 				return;
 			}
@@ -378,7 +378,7 @@ void UseCommand::exec(const StringVector& args) {
 		}
 
 		if(targets.empty()) {
-			print("Target no targets in range.");
+			print("No targets in range.");
 			return;
 		}
 

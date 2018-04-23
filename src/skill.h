@@ -37,10 +37,13 @@ enum SkillEffect {
 	HEAL,
 //	ROOT,
 //	PUSH,
+	DOT,
+	HOT
 };
 
 enum SkillTarget {
 	NO_TARGET,
+	SELF,
 	SINGLE,
 	FRONT_ROW,
 	BACK_ROW,

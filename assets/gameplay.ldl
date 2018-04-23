@@ -27,7 +27,7 @@ classes = {
 		damage     = [   20,   25,   30,   35,   40,   45 ]
 		range      = 1
 		sort_index = 0
-		skills     = []
+		skills     = [ endure ]
 	}
 	ranger = {
 		name       = "ranger"
@@ -47,7 +47,7 @@ classes = {
 		damage     = [   10,   13,   16,   19,   22,   25 ]
 		range      = 2
 		sort_index = 0
-		skills     = []
+		skills     = [ fireball ]
 	}
 //	priest = {
 //		name       = "priest"
@@ -113,6 +113,40 @@ skills = {
 		range     = 2
 		cooldown  = 4
 		mana_cost = 10
+	}
+
+	fireball = {
+		name = "fireball"
+		desc = "Engulf an unsuspecting enemy in flames and burn them to a crisp. Range: 3."
+		effects = [
+			{
+				type = damage
+				power = [ 80, 120 ]
+			}
+			{
+				type = [ none, dot ]
+				power = [ 0, 10 ]
+			}
+		]
+		target = single
+		range = 3
+		cooldown = 4
+		mana_cost = 15
+	}
+
+	endure = {
+		name = "endure"
+		desc = "Tapping into your unbreakable will, you keep fighting while your wounds stop being relevant."
+		effects = [
+			{
+				type = [ hot, hot ]
+				power = [ 8, 15 ]
+			}
+		]
+		target = self
+		range = 0
+		cooldown = 5
+		mana_cost = 20
 	}
 
 	fonxus_heal = {

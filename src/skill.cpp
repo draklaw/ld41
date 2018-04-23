@@ -202,6 +202,9 @@ CharacterVector Skill::targets() const {
 	case ANY_ROW:
 		dbgLogger.error("Invalid Skill::target call");
 		break;
+	case SELF:
+		chars.push_back(c);
+		break;
 	case FRONT_ROW:
 		for(unsigned i = 0; i < groups.count(team, FRONT); ++i) {
 			CharacterSP t = groups.get(team, FRONT, i);
@@ -326,10 +329,15 @@ void Skill::_use(CharacterSP target) {
 			print("  ", target->name(), " heal ", power, " hp.");
 			target->heal(power, character());
 			break;
+		case DOT:
+			print("  ", target->name(), " will take ", power, " damage for 3 turns.");
+			target->_buffs.push_back(Buff {3, (int) power, 'd'});
+		case HOT:
+			print("  ", target->name(), " regenerates ", power, " hp for 3 turns.");
+			target->_buffs.push_back(Buff {3, (int) power, 'h'});
 		}
 	}
 }
-
 
 
 SkillEffect parseSkillEffect(const lair::String& str) {
@@ -337,13 +345,19 @@ SkillEffect parseSkillEffect(const lair::String& str) {
 		return DAMAGE;
 	else if(str == "heal")
 		return HEAL;
+	else if(str == "dot")
+		return DOT;
+	else if(str == "hot")
+		return HOT;
 	dbgLogger.error("Unknown skill effect type \"", str, "\"");
 	return NO_EFFECT;
 }
 
 
 SkillTarget parseSkillTarget(const lair::String& str) {
-	if(str == "single")
+	if(str == "self")
+		return SELF;
+	else if(str == "single")
 		return SINGLE;
 	else if(str == "front_row")
 		return FRONT_ROW;

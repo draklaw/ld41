@@ -27,6 +27,14 @@
 
 #include "text_moba.h"
 
+class Buff {
+public:
+	unsigned ticks;
+	int amount;
+	char type;
+};
+
+typedef std::vector<Buff> BuffVector;
 
 class Character : public std::enable_shared_from_this<Character> {
 public:
@@ -107,6 +115,7 @@ public:
 
 	unsigned _deathTime;
 
+	BuffVector _buffs;
 	SkillVector _skills;
 
 	AiSP     _ai;

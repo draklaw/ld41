@@ -575,24 +575,53 @@ void TextMoba::grantXp(CharacterSP character, unsigned xp) {
 void TextMoba::nextTurn() {
 	_turn += 1;
 
+	// NPC turns
 	for(CharacterSP c: _characters) {
+
+		BuffVector nb;
+		for (Buff b: c->_buffs)
+		{
+			switch (b.type) {
+				case 'h':
+					c->heal(b.amount);
+					break;
+				case 'd':
+					c->takeDamage(b.amount);
+					break;
+				default:
+					dbgLogger.warning("Unknown buff type : '", b.type,"'.");
+			}
+
+			if (--b.ticks)
+				nb.push_back(b);
+		}
+		c->_buffs.swap(nb);
+
+		// Skip player
+		if (c == player())
+			continue;
+
+		// Cooldowns
 		for(SkillSP skill: c->skills()) {
 			if(skill->timeBeforeNextUse() != 0)
 				skill->_timeBeforeNextUse -= 1;
 		}
 
+		// AI
 		if(c->ai()) {
 			c->ai()->play();
 		}
 	}
 
+	// Minion waves.
 	_nextWaveCounter -= 1;
 	if(_nextWaveCounter == 0) {
-		_console->writeLine("A new batch of redshirts leave the fonxus.");
+		_console->writeLine("A new batch of redshirts is leaving the fonxus.");
 		spawnRedshirts(_redshirtPerLane);
 		_nextWaveCounter = _waveTime;
 	}
 
+	// Player cooldowns
 	for(SkillSP skill: player()->skills()) {
 		if(skill->timeBeforeNextUse() != 0)
 			skill->_timeBeforeNextUse -= 1;
@@ -898,7 +927,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 	// Player *must* have charIndex 0
 	_charIndex = 0;
-	_player = spawnCharacter("ranger", BLUE, mapNode("bf"));
+	_player = spawnCharacter("mage", BLUE, mapNode("bf"));
 	_heroes.push_back(_player);
 
 	_heroes.push_back(spawnCharacter("warrior", BLUE, mapNode("bf")));
