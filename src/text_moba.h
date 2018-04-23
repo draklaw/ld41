@@ -113,6 +113,14 @@ public:
 	MainState* mainState();
 	Console* console();
 
+	unsigned heroNextLevel(unsigned level) const;
+	unsigned heroXpWorth(unsigned level) const;
+	unsigned redshirtXpWorth(unsigned level) const;
+	unsigned towerXpWorth(unsigned level) const;
+
+	unsigned nextLevel(CharacterSP character) const;
+	unsigned xpWorth(CharacterSP character) const;
+
 	MapNodeSP mapNode(const lair::String& id);
 	MapNodeSP fonxus(Team team);
 	CharacterClassSP characterClass(const lair::String& id);
@@ -127,9 +135,13 @@ public:
 
 	void moveCharacter(CharacterSP character, MapNodeSP dest);
 	void placeCharacter(CharacterSP character, Place place);
+
 	void attack(CharacterSP attacker, CharacterSP target);
 	void dealDamage(CharacterSP target, unsigned damage,
 	                CharacterSP attacker = nullptr);
+
+	void grantXp(CharacterSP character, unsigned xp);
+
 	void nextTurn();
 
 	const TMCommandList& commands() const;
@@ -175,6 +187,11 @@ public:
 	unsigned _firstWaveTime;
 	unsigned _waveTime;
 	unsigned _redshirtPerLane;
+
+	IntVector _heroNextLevel;
+	IntVector _heroXpWorth;
+	IntVector _redshirtXpWorth;
+	IntVector _towerXpWorth;
 
 	unsigned _turn;
 	unsigned _nextWaveCounter;

@@ -264,6 +264,44 @@ Console* TextMoba::console() {
 }
 
 
+unsigned TextMoba::heroNextLevel(unsigned level) const {
+	return _heroNextLevel.at(level);
+}
+
+
+unsigned TextMoba::heroXpWorth(unsigned level) const {
+	return _heroXpWorth.at(level);
+}
+
+
+unsigned TextMoba::redshirtXpWorth(unsigned level) const {
+	return _redshirtXpWorth.at(level);
+}
+
+
+unsigned TextMoba::towerXpWorth(unsigned level) const {
+	return _towerXpWorth.at(level);
+}
+
+
+unsigned TextMoba::nextLevel(CharacterSP character) const {
+	return (character->type() == HERO)? heroNextLevel(character->level()): 0;
+}
+
+
+unsigned TextMoba::xpWorth(CharacterSP character) const {
+	switch(character->type()) {
+	case HERO:
+		return heroXpWorth(character->level());
+	case REDSHIRT:
+		return redshirtXpWorth(character->level());
+	case BUILDING:
+		return towerXpWorth(character->level());
+	}
+	return 0;
+}
+
+
 MapNodeSP TextMoba::mapNode(const String& id) {
 	auto it = _nodes.find(id);
 	if(it == _nodes.end())
@@ -355,6 +393,14 @@ void TextMoba::killCharacter(CharacterSP character, CharacterSP attacker) {
 		}
 	}
 
+	unsigned xp = xpWorth(character);
+	for(CharacterSP c: character->node()->characters()) {
+		if(c->team() == character->team() || c->type() != HERO)
+			continue;
+
+		grantXp(c, xp);
+	}
+
 	if(character->type() == HERO) {
 		moveCharacter(character, fonxus(character->team()));
 		// TODO: Death & respawn
@@ -427,6 +473,31 @@ void TextMoba::dealDamage(CharacterSP target, unsigned damage, CharacterSP attac
 	}
 	else {
 		target->_hp -= damage;
+	}
+}
+
+
+void TextMoba::grantXp(CharacterSP character, unsigned xp) {
+	if(character == player()) {
+		print(character->name(), " gains ", xp, " xp.");
+	}
+
+	character->_xp += xp;
+	unsigned nextLevelXp = nextLevel(character);
+	if(nextLevelXp == 0 || character->xp() < nextLevelXp)
+		return;
+
+	// Level-up !
+	if(character->team() == BLUE) {
+		float hpRatio = float(character->hp()) / float(character->maxHP());
+		float manaRatio = float(character->mana()) / float(character->maxMana());
+
+		character->_level += 1;
+		character->_xp    -= nextLevelXp;
+		print(character->name(), " reaches lvl ", character->level() + 1);
+
+		character->_hp   = character->maxHP()   * hpRatio;
+		character->_mana = character->maxMana() * manaRatio;
 	}
 }
 
@@ -533,6 +604,11 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	_firstWaveTime   = getInt(config, "first_wave_time");
 	_waveTime        = getInt(config, "wave_time");
 	_redshirtPerLane = getInt(config, "redshirt_per_lane");
+
+	_heroNextLevel   = getClassStats(config, "hero_next_level");
+	_heroXpWorth     = getClassStats(config, "hero_xp_worth");
+	_redshirtXpWorth = getClassStats(config, "redshirt_xp_worth");
+	_towerXpWorth    = getClassStats(config, "tower_xp_worth");
 
 	Variant nodes = config.get("nodes");
 	if(nodes.isVarMap()) {
@@ -642,10 +718,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 			cClass->_maxHP     = getClassStats(obj, "max_hp");
 			cClass->_maxMana   = getClassStats(obj, "max_mana");
-			cClass->_xp        = getClassStats(obj, "xp");
 			cClass->_damage    = getClassStats(obj, "damage");
 			cClass->_range     = getClassStats(obj, "range");
-			cClass->_speed     = getClassStats(obj, "speed");
 
 			_classes.emplace(cClass->id(), cClass);
 		}

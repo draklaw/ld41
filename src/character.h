@@ -57,6 +57,7 @@ public:
 
 	unsigned maxHP() const;
 	unsigned maxMana() const;
+
 	unsigned level() const;
 	unsigned xp() const;
 	unsigned hp() const;
