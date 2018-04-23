@@ -30,11 +30,12 @@
 
 class CharacterGroups {
 public:
-	CharacterGroups(const MapNode* node);
+	CharacterGroups(const MapNode* node = nullptr);
 
 	unsigned count() const;
 	unsigned count(Team team) const;
 	unsigned count(Team team, Place place) const;
+	unsigned count(CharType type, Team team) const;
 
 	CharacterSP get(unsigned index) const;
 	CharacterSP get(Team team, unsigned index) const;

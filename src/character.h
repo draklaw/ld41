@@ -79,6 +79,7 @@ public:
 	unsigned placeIndex() const;
 
 	void moveTo(MapNodeSP dest);
+	void goToPlace(Place place);
 	void attack(CharacterSP target);
 	void takeDamage(unsigned damage, CharacterSP attacker = nullptr);
 

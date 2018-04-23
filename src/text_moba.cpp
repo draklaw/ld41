@@ -32,6 +32,7 @@
 #include "ai.h"
 #include "redshirt_ai.h"
 #include "tower_ai.h"
+#include "hero_ai.h"
 #include "tm_command.h"
 
 #include "text_moba.h"
@@ -591,6 +592,13 @@ bool TextMoba::_execCommand(const String& command) {
 
 
 void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
+	// Cleanup
+
+	_heroes.clear();
+
+
+	// Parse ldl
+
 	ErrorList errors;
 	LdlParser parser(&in, logicPath.utf8String(), &errors, LdlParser::CTX_MAP);
 
@@ -601,6 +609,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		errors.log(dbgLogger);
 	}
 	errors.log(dbgLogger);
+
+	// Read gameplay.ldl
 
 	Variant motd = config.get("motd");
 	if(motd.isString()) {
@@ -736,13 +746,25 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 
 	// Setup
 
-
 	_turn = 0;
 	_nextWaveCounter = _firstWaveTime;
 
 	// Player *must* have charIndex 0
 	_charIndex = 0;
 	_player = spawnCharacter("ranger", BLUE, mapNode("bf"));
+	_heroes.push_back(_player);
+
+	_heroes.push_back(spawnCharacter("warrior", BLUE, mapNode("bf")));
+	_heroes.push_back(spawnCharacter("mage", BLUE, mapNode("bf")));
+
+	_heroes.push_back(spawnCharacter("ranger", RED, mapNode("rf")));
+	_heroes.push_back(spawnCharacter("warrior", RED, mapNode("rf")));
+	_heroes.push_back(spawnCharacter("mage", RED, mapNode("rf")));
+
+	for(unsigned i = 1; i < _heroes.size(); ++i) {
+		CharacterSP c = _heroes[i];
+		c->setAi<HeroAi>((c->className() == "ranger")? TOP: BOT);
+	}
 
 	for(const auto& pair: _nodes) {
 		MapNodeSP node = pair.second;

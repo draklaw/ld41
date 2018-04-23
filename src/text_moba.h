@@ -195,6 +195,8 @@ public:
 
 	unsigned _turn;
 	unsigned _nextWaveCounter;
+
+	CharacterVector _heroes;
 };
 
 

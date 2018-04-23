@@ -33,6 +33,10 @@ using namespace lair;
 CharacterGroups::CharacterGroups(const MapNode* node)
     : _node(node)
 {
+	if(!_node) {
+		return;
+	}
+
 	_characters.resize(node->_characters.size());
 	std::copy(node->_characters.begin(), node->_characters.end(),
 	          _characters.begin());
@@ -92,6 +96,18 @@ unsigned CharacterGroups::count(Team team) const {
 
 unsigned CharacterGroups::count(Team team, Place place) const {
 	return _index(team, place + 1) - _index(team, place);
+}
+
+
+unsigned CharacterGroups::count(CharType type, Team team) const {
+	unsigned c = 0;
+	unsigned teamCount = count(team);
+	for(unsigned i = 0; i < teamCount; ++i) {
+		if(get(team, i)->type() == type) {
+			c += 1;
+		}
+	}
+	return c;
 }
 
 

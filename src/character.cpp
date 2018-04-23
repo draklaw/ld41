@@ -194,6 +194,11 @@ void Character::moveTo(MapNodeSP dest) {
 }
 
 
+void Character::goToPlace(Place place) {
+	_textMoba->placeCharacter(shared_from_this(), place);
+}
+
+
 void Character::attack(CharacterSP target) {
 	_textMoba->attack(shared_from_this(), target);
 }

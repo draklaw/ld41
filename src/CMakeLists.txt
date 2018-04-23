@@ -39,6 +39,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 	ai.cpp
 	redshirt_ai.cpp
 	tower_ai.cpp
+	hero_ai.cpp
 	tm_command.cpp
 	text_moba.cpp
 	commands.cpp
