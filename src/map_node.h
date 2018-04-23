@@ -48,6 +48,8 @@ public:
 
 	unsigned _index(unsigned team, unsigned place) const;
 
+	void dump() const;
+
 public:
 	const MapNode* _node;
 	CharacterVector _characters;

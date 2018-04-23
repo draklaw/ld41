@@ -89,11 +89,14 @@ void HeroAi::play() {
 
 	case BACK_TO_BASE: {
 		// TODO: TP to base from somewhere safe
-		if(!move(BACKWARD)) {
+		if(c->node() == c->_textMoba->fonxus(c->team())) {
 			// Attack enemies at the Fonxus.
 			if(_groups.count(c->enemyTeam())) {
 				attackClosest();
 			}
+		}
+		else {
+			move(BACKWARD);
 		}
 		break;
 	}
