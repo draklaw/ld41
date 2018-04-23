@@ -582,7 +582,12 @@ void TextMoba::nextTurn() {
 
 	// NPC turns
 	for(CharacterSP c: _characters) {
+		// Fonxus regen
+		if (c->className() == "fonxus")
+			for (SkillSP s: c->skills())
+				s->use();
 
+		// Buffs
 		BuffVector nb;
 		for (Buff b: c->_buffs)
 		{
