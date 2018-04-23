@@ -81,11 +81,13 @@ HelpCommand::HelpCommand(TextMoba* textMoba)
 	_desc = "  Prints this help message.";
 }
 
-void HelpCommand::exec(const StringVector& /*args*/) {
+bool HelpCommand::exec(const StringVector& /*args*/) {
 	for(auto cmd: tm()->commands()) {
 		print(join(cmd->names()));
 		print(cmd->desc());
 	}
+
+	return true;
 }
 
 
@@ -101,10 +103,10 @@ LookCommand::LookCommand(TextMoba* textMoba)
 	        "  Example: look tower (describe a tower)";
 }
 
-void LookCommand::exec(const StringVector& args) {
+bool LookCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	if(args.size() == 1) {
@@ -123,6 +125,8 @@ void LookCommand::exec(const StringVector& args) {
 			i += 1;
 		}
 	}
+
+	return true;
 }
 
 
@@ -137,16 +141,17 @@ DirectionsCommand::DirectionsCommand(TextMoba* textMoba)
 	_desc = "  List the destinations you can reach from here.";
 }
 
-void DirectionsCommand::exec(const StringVector& /*args*/) {
+bool DirectionsCommand::exec(const StringVector& /*args*/) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	print("From here, you can go toward:");
 	for(const auto& pair: player()->node()->paths()) {
 		print("  ", join(pair.second), ": toward ", pair.first->name());
 	}
+	return true;
 }
 
 
@@ -160,8 +165,9 @@ WaitCommand::WaitCommand(TextMoba* textMoba)
 	_desc = "  Do nothing until next turn.";
 }
 
-void WaitCommand::exec(const StringVector& /*args*/) {
+bool WaitCommand::exec(const StringVector& /*args*/) {
 	_textMoba->nextTurn();
+	return true;
 }
 
 
@@ -176,10 +182,10 @@ GoCommand::GoCommand(TextMoba* textMoba)
 	        "  you can go. Example: go red (go toward the red base)";
 }
 
-void GoCommand::exec(const StringVector& args) {
+bool GoCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	if(args.size() != 2) {
@@ -192,13 +198,15 @@ void GoCommand::exec(const StringVector& args) {
 		MapNodeSP dest = node->destination(dir);
 		if(dest) {
 			tm()->moveCharacter(player(), dest);
-			tm()->_execCommand("look");
+			tm()->execCommand("look");
 			tm()->nextTurn();
 		}
 		else {
 			print("Unknown direction \"", dir, "\"");
 		}
 	}
+
+	return true;
 }
 
 
@@ -213,10 +221,10 @@ MoveCommand::MoveCommand(TextMoba* textMoba)
 	        "  character to the front/back row.";
 }
 
-void MoveCommand::exec(const StringVector& args) {
+bool MoveCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	if(args.size() != 2 || (args[1] != "front" && args[1] != "back")) {
@@ -227,13 +235,15 @@ void MoveCommand::exec(const StringVector& args) {
 		Place place = Place((args[1] == "front")? FRONT: BACK);
 		if(place == player()->place()) {
 			print("You already are at the ", args[1], " row.");
-			return;
+			return true;
 		}
 		else {
 			tm()->placeCharacter(player(), place);
 			tm()->nextTurn();
 		}
 	}
+
+	return true;
 }
 
 
@@ -248,10 +258,10 @@ AttackCommand::AttackCommand(TextMoba* textMoba)
 	        "  see when you run the command look.";
 }
 
-void AttackCommand::exec(const StringVector& args) {
+bool AttackCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	if(args.size() != 2) {
@@ -267,30 +277,32 @@ void AttackCommand::exec(const StringVector& args) {
 		}
 		catch(std::invalid_argument) {
 			print("I don't understand who you try to attack.");
-			return;
+			return true;
 		}
 
 		CharacterSP target = player()->node()->characterAt(index);
 
 		if(!target || !target->isAlive()) {
 			print("Invalid target.");
-			return;
+			return true;
 		}
 
 		if(target->team() == player()->team()) {
 			print("You cannot attack allies.");
-			return;
+			return true;
 		}
 
 		CharacterGroups groups = player()->node()->characterGroups();
 		if(groups.distanceBetween(player(), target) > player()->range()) {
 			print("Target out of range.");
-			return;
+			return true;
 		}
 
 		player()->attack(target);
 		tm()->nextTurn();
 	}
+
+	return true;
 }
 
 
@@ -306,10 +318,10 @@ UseCommand::UseCommand(TextMoba* textMoba)
 	        "    use bomb front";
 }
 
-void UseCommand::exec(const StringVector& args) {
+bool UseCommand::exec(const StringVector& args) {
 	if(!player()->isAlive()) {
 		print("You are dead...");
-		return;
+		return true;
 	}
 
 	if(args.size() < 2) {
@@ -320,12 +332,12 @@ void UseCommand::exec(const StringVector& args) {
 		SkillSP skill = player()->skill(args[1]);
 		if(!skill) {
 			print("You don't have a skill called ", args[1]);
-			return;
+			return true;
 		}
 
 		if(!skill->usable()) {
 			print("You can't use this skill right now.");
-			return;
+			return true;
 		}
 
 		CharacterVector targets;
@@ -333,7 +345,7 @@ void UseCommand::exec(const StringVector& args) {
 			if(args.size() != 3) {
 				print("This skill targets a single foe and so takes a "
 				      "<character-number> in parameter.");
-				return;
+				return true;
 			}
 
 			unsigned charIndex = 9999;
@@ -342,32 +354,32 @@ void UseCommand::exec(const StringVector& args) {
 			}
 			catch(std::invalid_argument) {
 				print("I don't understand who you're trying to attack.");
-				return;
+				return true;
 			}
 
 			CharacterSP target = player()->node()->characterAt(charIndex);
 
 			if(!target || !target->isAlive()) {
 				print("Invalid target.");
-				return;
+				return true;
 			}
 
 			if(target->team() != skill->targetTeam()) {
 				print("Target is in the wrong team.");
-				return;
+				return true;
 			}
 
 			targets = skill->targets(target);
 			if(targets.empty()) {
 				print("Target is out-of-range.");
-				return;
+				return true;
 			}
 		}
 		else if(skill->target() == ANY_ROW) {
 			if(args.size() != 3 || (args[2] != "front" && args[2] != "back")) {
 				print("This skill target a row so you need to choose between "
 				      " \"front\" or \"back\". The row must be in range.");
-				return;
+				return true;
 			}
 
 			Place place = (args[2] == "front")? FRONT: BACK;
@@ -379,11 +391,60 @@ void UseCommand::exec(const StringVector& args) {
 
 		if(targets.empty()) {
 			print("No targets in range.");
-			return;
+			return true;
 		}
 
 		player()->_mana -= skill->manaCost();
 		skill->useOn(targets);
 		tm()->nextTurn();
 	}
+
+	return true;
+}
+
+
+
+RestartCommand::RestartCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+    , _readClass(false)
+{
+	_names.emplace_back("restart");
+
+	_desc = "  Restart the game.";
+}
+
+bool RestartCommand::exec(const StringVector& args) {
+	if(!_readClass && args.size() == 1) {
+		print("Choose your class: [ warrior, ranger, mage ]");
+		_readClass = true;
+		return false;
+	}
+
+	String className;
+	if(!_readClass && args.size() == 2) {
+		className = args[1];
+	}
+	else if(_readClass && args.size() == 1) {
+		className = args[0];
+	}
+	else if(!_readClass) {
+		print(args[0], " takes 0 or 1 parameter.");
+		return true;
+	}
+	else {
+		print("Please enter one class name: warrior, ranger or mage.");
+		return false;
+	}
+
+	if(className == "warrior" || className == "ranger" || className == "mage") {
+		tm()->restart(className);
+		_readClass = false;
+	}
+	else {
+		print("Unknown class name ", className);
+		print("Please enter one class name: warrior, ranger or mage.");
+		return !_readClass;
+	}
+
+	return true;
 }

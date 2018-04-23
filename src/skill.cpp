@@ -304,7 +304,9 @@ void Skill::useOn(const CharacterVector& chars) {
 
 
 SkillEffect parseSkillEffect(const lair::String& str) {
-	if(str == "damage")
+	if(str == "none")
+		return NO_EFFECT;
+	else if(str == "damage")
 		return DAMAGE;
 	else if(str == "heal")
 		return HEAL;

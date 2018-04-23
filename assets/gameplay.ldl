@@ -112,13 +112,13 @@ skills = {
 		effects   = [
 			{
 				type  = damage
-				power = 50
+				power = [ 30, 50 ]
 			}
 		]
 		target    = any_row
 		range     = 2
 		cooldown  = 4
-		mana_cost = 10
+		mana_cost = [ 10, 15 ]
 	}
 
 	fireball = {

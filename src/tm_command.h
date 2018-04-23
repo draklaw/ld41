@@ -28,13 +28,13 @@
 
 class TMCommand {
 public:
-	TMCommand(TextMoba* textMoba);
+	TMCommand(TextMoba* textMoba, bool hidden = false);
 	virtual ~TMCommand();
 
 	const StringVector& names() const;
 	const lair::String& desc() const;
 
-	virtual void exec(const StringVector& args) = 0;
+	virtual bool exec(const StringVector& args) = 0;
 
 	template<typename... Args>
 	inline void print(Args&&... args) const {
@@ -46,7 +46,8 @@ public:
 
 protected:
 	TextMoba*    _textMoba;
-	StringVector   _names;
+	bool         _hidden;
+	StringVector _names;
 	lair::String _desc;
 };
 
