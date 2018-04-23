@@ -233,6 +233,8 @@ void MainState::addMapIcon(CharacterSP character) {
 	s->setColor((character->team() == BLUE)?
 	                Vector4(.2, .2, .8, 1):
 	                Vector4(.8, .2, .2, 1));
+
+	_mapCharMap[character->node().get()].push_back(e);
 }
 
 
@@ -465,13 +467,31 @@ void MainState::updateFrame() {
 	}
 
 
+	_mapCharMap.clear();
 	while(_map.firstChild().isValid()) {
 		_map.firstChild().destroy();
 	}
-	addMapIcon(player);
-//	for(CharacterSP c: _textMoba._characters) {
+	for(CharacterSP c: _textMoba.characters()) {
+		addMapIcon(c);
+	}
 
-//	}
+	const float offset = 16;
+	for(const auto& pair: _mapCharMap) {
+		const EntityVector& entities = pair.second;
+
+		if(entities.size() < 2)
+			continue;
+
+		int width = std::ceil(std::sqrt(entities.size()));
+		int height = (entities.size() - 1) / width + 1;
+		Vector2 base = entities[0].position2() - Vector2(width - 1, -height + 1) * offset / 2;
+
+		int i = 0;
+		for(EntityRef e: entities) {
+			e.placeAt(Vector2(base + Vector2(i % width, -i / width) * offset));
+			i += 1;
+		}
+	}
 
 
 	// Rendering

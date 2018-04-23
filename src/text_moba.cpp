@@ -362,6 +362,11 @@ CharacterClassSP TextMoba::characterClass(const lair::String& id) {
 }
 
 
+const CharacterSet& TextMoba::characters() const {
+	return _characters;
+}
+
+
 CharacterSP TextMoba::player() {
 	return _player;
 }

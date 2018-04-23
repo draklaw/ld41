@@ -69,7 +69,8 @@ struct CommandExpr {
 typedef std::deque<CommandExpr> CommandList;
 
 
-typedef std::unordered_map<MapNode*, EntityRef> MapCharMap;
+typedef std::vector<EntityRef> EntityVector;
+typedef std::unordered_map<MapNode*, EntityVector> MapCharMap;
 
 
 class MainState : public GameState {
