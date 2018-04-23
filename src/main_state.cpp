@@ -404,12 +404,12 @@ void MainState::updateFrame() {
 	String stats = cat(
 	    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
 	    "\n",
-	    "hp:   ", std::setw(4), player->hp(),   " / ", std::setw(4), player->maxHP(), "\n",
-	    "mana: ", std::setw(4), player->mana(), " / ", std::setw(4), player->maxMana(), "\n",
-	    "xp:   ", std::setw(4), player->xp(),   " / ", std::setw(4), _textMoba.nextLevel(player), "\n",
+	    "hp:   ", std::setw(4), player->hp(),   " / ", player->maxHP(), "\n",
+	    "mana: ", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
+	    "xp:   ", std::setw(4), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
 	    "\n",
-	    "at ", player->node()->name(), "\n",
-	    "\n"
+//	    "at ", player->node()->name(), "\n",
+//	    "\n"
 	    "Skills stats\n"
 	    "\n",
 	    "TODO: alies info\n"
