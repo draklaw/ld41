@@ -510,7 +510,7 @@ void MainState::updateFrame() {
 			}
 
 			EntityRef e = _entities.cloneEntity(_charModel, _view);
-			e.placeAt(Vector2(x, 50));
+			e.placeAt(Vector2(x, (c->place() == BACK)? 60: 30));
 			index += 1;
 
 			SpriteComponent* s = _sprites.get(e);
