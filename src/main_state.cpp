@@ -20,11 +20,15 @@
 
 
 #include <functional>
+#include <iomanip>
 
 #include <lair/core/json.h>
 
 #include "game.h"
 #include "splash_state.h"
+
+#include "map_node.h"
+#include "character.h"
 
 #include "main_state.h"
 
@@ -394,6 +398,25 @@ void MainState::updateFrame() {
 		_cursor.setEnabled(cursor(0) >= 0);
 		_cursor.placeAt(pos);
 		_cursor.computeWorldTransform();
+	}
+
+	CharacterSP player = _textMoba.player();
+	String stats = cat(
+	    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
+	    "\n",
+	    "hp:   ", std::setw(4), player->hp(),   " / ", std::setw(4), player->maxHP(), "\n",
+	    "mana: ", std::setw(4), player->mana(), " / ", std::setw(4), player->maxMana(), "\n",
+	    "xp:   ", std::setw(4), player->xp(),   " / ", std::setw(4), _textMoba.nextLevel(player), "\n",
+	    "\n",
+	    "at ", player->node()->name(), "\n",
+	    "\n"
+	    "Skills stats\n"
+	    "\n",
+	    "TODO: alies info\n"
+	);
+	BitmapTextComponent* statsText = _texts.get(_statsText);
+	if(statsText) {
+		statsText->setText(stats);
 	}
 
 

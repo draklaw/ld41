@@ -478,13 +478,16 @@ void TextMoba::dealDamage(CharacterSP target, unsigned damage, CharacterSP attac
 
 
 void TextMoba::grantXp(CharacterSP character, unsigned xp) {
+	unsigned nextLevelXp = nextLevel(character);
+	if(nextLevelXp == 0)
+		return;
+
 	if(character == player()) {
 		print(character->name(), " gains ", xp, " xp.");
 	}
 
 	character->_xp += xp;
-	unsigned nextLevelXp = nextLevel(character);
-	if(nextLevelXp == 0 || character->xp() < nextLevelXp)
+	if(character->xp() < nextLevelXp)
 		return;
 
 	// Level-up !
@@ -498,6 +501,9 @@ void TextMoba::grantXp(CharacterSP character, unsigned xp) {
 
 		character->_hp   = character->maxHP()   * hpRatio;
 		character->_mana = character->maxMana() * manaRatio;
+
+		if(nextLevel(character) == 0)
+			character->_xp = 0;
 	}
 }
 
