@@ -137,7 +137,7 @@ public:
 	CharacterSP spawnCharacter(const lair::String& className, Team team,
 	                           MapNodeSP node = MapNodeSP());
 	CharacterSP spawnRedshirt(Team team, Lane lane);
-	void spawnRedshirts(unsigned count);
+	void spawnRedshirts(Team team, unsigned count);
 
 	void killCharacter(CharacterSP character, CharacterSP attacker = nullptr);
 
@@ -150,9 +150,13 @@ public:
 	void healCharacter(CharacterSP target, unsigned amount,
 	                   CharacterSP healer = nullptr);
 
+	void useSkillOn(SkillSP skill, const CharacterVector& targets);
+	void _useSkillOn(SkillSP skill, CharacterSP target);
+
 	void grantXp(CharacterSP character, unsigned xp);
 
 	void nextTurn();
+	void nextTurn(CharacterSP character);
 
 	const TMCommandList& commands() const;
 	TMCommand* command(const lair::String& name) const;

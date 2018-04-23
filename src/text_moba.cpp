@@ -429,12 +429,10 @@ CharacterSP TextMoba::spawnRedshirt(Team team, Lane lane) {
 }
 
 
-void TextMoba::spawnRedshirts(unsigned count) {
+void TextMoba::spawnRedshirts(Team team, unsigned count) {
 	for(unsigned i = 0; i < count; ++i) {
-		spawnRedshirt(BLUE, TOP);
-		spawnRedshirt(BLUE, BOT);
-		spawnRedshirt(RED,  TOP);
-		spawnRedshirt(RED,  BOT);
+		spawnRedshirt(team, TOP);
+		spawnRedshirt(team, BOT);
 	}
 }
 
@@ -546,6 +544,76 @@ void TextMoba::healCharacter(CharacterSP target, unsigned amount, CharacterSP /*
 }
 
 
+void TextMoba::useSkillOn(SkillSP skill, const CharacterVector& targets) {
+	CharacterSP character = skill->character();
+
+	if(player()->isAlive() && character->node() == player()->node()) {
+		print(character->name(), " uses ", skill->name(), "...");
+	}
+
+	for(CharacterSP c: targets) {
+		_useSkillOn(skill, c);
+	}
+	skill->_timeBeforeNextUse = skill->cooldown() + 1;
+}
+
+
+void TextMoba::_useSkillOn(SkillSP skill, CharacterSP target) {
+	CharacterSP character = skill->character();
+
+	dbgLogger.log(character->debugName(), " uses skill ", skill->id(), " lvl ", skill->_level,
+	              " on ", target->debugName());
+
+	bool printMessage = player()->isAlive() && character->node() == player()->node();
+
+	for(const SkillModel::Effect& effect: skill->_model->effects()) {
+		SkillEffect effectType = effect.type(skill->level());
+		unsigned power = effect.power(skill->level());
+
+//		dbgLogger.info("  effect ", effectType, ": power ", power);
+
+		switch(effectType) {
+		case NO_EFFECT:
+			break;
+		case DAMAGE:
+			if(printMessage) {
+				print("  ", target->name(), " takes ", power, " damage.");
+			}
+
+			// Don't call attack to avoid the "x attack y" message
+			target->takeDamage(power, character);
+			break;
+
+		case HEAL:
+			if(target->hp() != target->maxHP()) {
+				if(printMessage) {
+					print("  ", target->name(), " heal ", power, " hp.");
+				}
+
+				target->heal(power, character);
+			}
+			break;
+
+		case DOT:
+			if(printMessage) {
+				print("  ", target->name(), " will take ", power, " damage for 3 turns.");
+			}
+
+			target->_buffs.push_back(Buff {3, (int) power, 'd'});
+			break;
+
+		case HOT:
+			if(printMessage) {
+				print("  ", target->name(), " regenerates ", power, " hp for 3 turns.");
+			}
+
+			target->_buffs.push_back(Buff {3, (int) power, 'h'});
+			break;
+		}
+	}
+}
+
+
 void TextMoba::grantXp(CharacterSP character, unsigned xp) {
 	unsigned nextLevelXp = nextLevel(character);
 	if(nextLevelXp == 0)
@@ -580,72 +648,96 @@ void TextMoba::grantXp(CharacterSP character, unsigned xp) {
 void TextMoba::nextTurn() {
 	_turn += 1;
 
-	// NPC turns
-	for(CharacterSP c: _characters) {
-		// Fonxus regen
-		if (c->className() == "fonxus")
-			for (SkillSP s: c->skills())
-				s->use();
+	auto cit  = _characters.begin();
+	auto cend = _characters.end();
 
-		// Hero regens
-		if (c->type() == HERO)
-		{
-			c->heal(1);
-			c->_mana = std::min(c->mana() + 2, c->maxMana());
-		}
+	_nextWaveCounter -= 1;
 
-		// Buffs
-		BuffVector nb;
-		for (Buff b: c->_buffs)
-		{
-			switch (b.type) {
-				case 'h':
-					c->heal(b.amount);
-					break;
-				case 'd':
-					c->takeDamage(b.amount);
-					break;
-				default:
-					dbgLogger.warning("Unknown buff type : '", b.type,"'.");
-			}
-
-			if (--b.ticks)
-				nb.push_back(b);
-		}
-		c->_buffs.swap(nb);
-
-		// Skip player
-		if (c == player())
-			continue;
-
-		// Cooldowns
-		for(SkillSP skill: c->skills()) {
-			if(skill->timeBeforeNextUse() != 0)
-				skill->_timeBeforeNextUse -= 1;
-		}
-
-		// AI
-		if(c->ai()) {
-			c->ai()->play();
+	// Blue NPC turns
+	for(; cit != cend && (*cit)->team() == BLUE; ++cit) {
+		if(*cit != player()) {
+			nextTurn(*cit);
 		}
 	}
 
-	// Minion waves.
-	_nextWaveCounter -= 1;
+	// Blue minion waves.
+	if(_nextWaveCounter == 0) {
+		_console->writeLine("A new batch of blueshirts is leaving the fonxus.");
+		spawnRedshirts(BLUE, _redshirtPerLane);
+	}
+
+	// Red NPC turns
+	for(; cit != cend; ++cit) {
+		if(*cit != player()) {
+			nextTurn(*cit);
+		}
+	}
+
+	// Red minion waves.
 	if(_nextWaveCounter == 0) {
 		_console->writeLine("A new batch of redshirts is leaving the fonxus.");
-		spawnRedshirts(_redshirtPerLane);
-		_nextWaveCounter = _waveTime;
+		spawnRedshirts(RED, _redshirtPerLane);
 	}
 
-	// Player cooldowns
-	for(SkillSP skill: player()->skills()) {
+	if(_nextWaveCounter == 0)
+		_nextWaveCounter = _waveTime;
+
+	// Player turn
+	nextTurn(player());
+
+	_console->writeLine(cat("End of turn ", _turn));
+	_execCommand("look");
+}
+
+
+void TextMoba::nextTurn(CharacterSP character) {
+	// Fonxus regen
+	if(character->type() == BUILDING) {
+		for(SkillSP s: character->skills()) {
+			s->use();
+		}
+	}
+
+	// Hero regens
+	if(character->type() == HERO)
+	{
+		character->heal(2);
+		character->_mana = std::min(character->mana() + 1, character->maxMana());
+	}
+
+	BuffVector nb;
+	for (Buff b: character->_buffs)
+	{
+		// DOT / HOT
+		switch(b.type) {
+		case 'h':
+			character->heal(b.amount);
+			break;
+		case 'd':
+			character->takeDamage(b.amount);
+			break;
+		default:
+			dbgLogger.warning("Unknown buff type : '", b.type,"'.");
+		}
+
+		if(--b.ticks)
+			nb.push_back(b);
+	}
+	character->_buffs.swap(nb);
+
+	if(!character->isAlive())
+		return;
+
+	// Cooldowns
+	for(SkillSP skill: character->skills()) {
 		if(skill->timeBeforeNextUse() != 0)
 			skill->_timeBeforeNextUse -= 1;
 	}
 
-	_console->writeLine(cat("End of turn ", _turn));
-	_execCommand("look");
+	// AI
+	if(character->ai()) {
+		character->ai()->play();
+	}
 }
 
 

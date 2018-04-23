@@ -513,8 +513,6 @@ void MainState::updateFrame() {
 			SpriteComponent* s = _sprites.get(e);
 			s->setTexture(c->cClass()->image());
 		}
-
-		dumpEntityTree(log(), _scene);
 	}
 
 

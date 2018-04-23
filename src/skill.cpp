@@ -178,8 +178,10 @@ Team Skill::targetTeam() const {
 		case NO_EFFECT:
 			return BLUE;
 		case DAMAGE:
+		case DOT:
 			return character()->enemyTeam();
 		case HEAL:
+		case HOT:
 			return character()->team();
 		}
 	}
@@ -297,46 +299,7 @@ void Skill::use(CharacterSP target) {
 
 
 void Skill::useOn(const CharacterVector& chars) {
-	print(character()->name(), " uses ", name(), "...");
-	for(CharacterSP c: chars) {
-		_use(c);
-	}
-	_timeBeforeNextUse = cooldown() + 1;
-}
-
-
-void Skill::_use(CharacterSP target) {
-	CharacterSP c = character();
-
-	dbgLogger.log(c->debugName(), " uses skill ", id(), " lvl ", _level,
-	              " on ", target->debugName());
-
-	for(const SkillModel::Effect& effect: _model->effects()) {
-		SkillEffect effectType = effect.type(_level);
-		unsigned power = effect.power(_level);
-
-		dbgLogger.info("  effect ", effectType, ": power ", power);
-
-		switch(effectType) {
-		case NO_EFFECT:
-			break;
-		case DAMAGE:
-			print("  ", target->name(), " takes ", power, " damage.");
-			// Don't call attack to avoid the "x attack y" message
-			target->takeDamage(power, character());
-			break;
-		case HEAL:
-			print("  ", target->name(), " heal ", power, " hp.");
-			target->heal(power, character());
-			break;
-		case DOT:
-			print("  ", target->name(), " will take ", power, " damage for 3 turns.");
-			target->_buffs.push_back(Buff {3, (int) power, 'd'});
-		case HOT:
-			print("  ", target->name(), " regenerates ", power, " hp for 3 turns.");
-			target->_buffs.push_back(Buff {3, (int) power, 'h'});
-		}
-	}
+	character()->_textMoba->useSkillOn(shared_from_this(), chars);
 }
 
 

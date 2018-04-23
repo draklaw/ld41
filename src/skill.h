@@ -92,7 +92,7 @@ public:
 };
 
 
-class Skill {
+class Skill : public std::enable_shared_from_this<Skill> {
 public:
 	Skill(SkillModelSP model, unsigned level, CharacterSP character);
 
@@ -123,8 +123,6 @@ public:
 	void use(CharacterSP target);
 
 	void useOn(const CharacterVector& chars);
-
-	void _use(CharacterSP target);
 
 	template<typename... Args>
 	void print(Args&&... args) const {

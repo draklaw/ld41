@@ -382,6 +382,7 @@ void UseCommand::exec(const StringVector& args) {
 			return;
 		}
 
+		player()->_mana -= skill->manaCost();
 		skill->useOn(targets);
 		tm()->nextTurn();
 	}
