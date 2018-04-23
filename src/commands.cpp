@@ -27,6 +27,7 @@
 #include "map_node.h"
 #include "character_class.h"
 #include "character.h"
+#include "skill.h"
 #include "text_moba.h"
 
 #include "commands.h"
@@ -288,6 +289,100 @@ void AttackCommand::exec(const StringVector& args) {
 		}
 
 		player()->attack(target);
+		tm()->nextTurn();
+	}
+}
+
+
+
+UseCommand::UseCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+{
+	_names.emplace_back("use");
+	_names.emplace_back("u");
+
+	_desc = "  Use a skill. Some skills need a <character-number> or a\n"
+	        "  row (front or back) in parameter. Example: \n"
+	        "    use bomb front";
+}
+
+void UseCommand::exec(const StringVector& args) {
+	if(!player()->isAlive()) {
+		print("You are dead...");
+		return;
+	}
+
+	if(args.size() < 2) {
+		print("I don't understand what you try to use. Type");
+		print("  ", args[0], " <skill-name> [<character-number>|front|back]");
+	}
+	else {
+		SkillSP skill = player()->skill(args[1]);
+		if(!skill) {
+			print("You don't have a skill called ", args[1]);
+			return;
+		}
+
+		if(!skill->usable()) {
+			print("You can't use this skill right now.");
+			return;
+		}
+
+		CharacterVector targets;
+		if(skill->target() == SINGLE) {
+			if(args.size() != 3) {
+				print("This skill targets a single foe and so takes a "
+				      "<character-number> in parameter.");
+				return;
+			}
+
+			unsigned charIndex = 9999;
+			try {
+				charIndex = std::stoi(args[2]);
+			}
+			catch(std::invalid_argument) {
+				print("I don't understand who you try to attack.");
+				return;
+			}
+
+			CharacterSP target = player()->node()->characterAt(charIndex);
+
+			if(!target || !target->isAlive()) {
+				print("Invalid target.");
+				return;
+			}
+
+			if(target->team() == skill->targetTeam()) {
+				print("Target is in the wrong team.");
+				return;
+			}
+
+			targets = skill->targets(target);
+			if(targets.empty()) {
+				print("Target is out-of-range.");
+				return;
+			}
+		}
+		else if(skill->target() == ANY_ROW) {
+			if(args.size() != 3 || (args[2] != "front" && args[2] != "back")) {
+				print("This skill target a row so you need to choose between "
+				      " \"front\" or \"back\". The row must be in range.");
+				return;
+			}
+
+			Place place = (args[2] == "front")? FRONT: BACK;
+			targets = skill->targets(place);
+		}
+		else {
+			targets = skill->targets();
+		}
+
+		if(targets.empty()) {
+			print("Target no targets in range.");
+			return;
+		}
+
+		skill->useOn(targets);
 		tm()->nextTurn();
 	}
 }

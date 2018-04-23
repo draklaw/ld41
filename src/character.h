@@ -68,6 +68,10 @@ public:
 	bool isAlive() const;
 	bool deathTime() const;
 
+	const SkillVector& skills();
+	SkillSP skill(const lair::String& name);
+	void addSkill(SkillModelSP model, unsigned level = 1);
+
 	AiSP ai() const;
 
 	template<typename T, typename... Args>
@@ -82,6 +86,7 @@ public:
 	void goToPlace(Place place);
 	void attack(CharacterSP target);
 	void takeDamage(unsigned damage, CharacterSP attacker = nullptr);
+	void heal(unsigned amount, CharacterSP healer = nullptr);
 
 public:
 	TextMoba* _textMoba;
@@ -101,6 +106,8 @@ public:
 	unsigned _mana;
 
 	unsigned _deathTime;
+
+	SkillVector _skills;
 
 	AiSP     _ai;
 };

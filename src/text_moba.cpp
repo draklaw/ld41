@@ -29,6 +29,7 @@
 #include "map_node.h"
 #include "character_class.h"
 #include "character.h"
+#include "skill.h"
 #include "ai.h"
 #include "redshirt_ai.h"
 #include "tower_ai.h"
@@ -115,28 +116,64 @@ const String& getString(const Variant& var, const String& key, const String& def
 	return defaultValue;
 }
 
-IntVector getClassStats(const Variant& var, const String& key, bool* success = nullptr) {
+IntVector getIntList(const Variant& var, const String& key, unsigned size, int defaultValue, bool* success = nullptr) {
 	const Variant& v = getVarItem(var, key, success);
 
 	if(v.isInt()) {
-		return IntVector(6, v.asInt());
+		return IntVector(size, v.asInt());
 	}
 	if(v.isVarList()) {
-		IntVector stats(6, 0);
+		IntVector stats(size, defaultValue);
 		unsigned i = 0;
 		for(const Variant& v2: v.asVarList()) {
-			stats[i] = v2.asInt();
-			i += 1;
+			if(i < size) {
+				stats[i] = v2.asInt();
+				i += 1;
+			}
+			else {
+				dbgLogger.warning("Too much value in array ", key);
+				break;
+			}
 		}
 		return stats;
 	}
 	else if(!v.isNull()) {
-		dbgLogger.error("Expected String.");
+		dbgLogger.error("Expected Int list.");
 		if(success)
 			*success = false;
 	}
 
-	return IntVector(6, 0);
+	return IntVector(6, defaultValue);
+}
+
+StringVector getStringList(const Variant& var, const String& key, bool* success = nullptr) {
+	const Variant& v = getVarItem(var, key, success);
+
+	StringVector strings;
+	if(v.isString()) {
+		strings.push_back(v.asString());
+	}
+	if(v.isVarList()) {
+		for(const Variant& v2: v.asVarList()) {
+			if(v2.isString()) {
+				strings.push_back(v2.asString());
+			}
+			else {
+				dbgLogger.warning("Expected String");
+			}
+		}
+	}
+	else if(!v.isNull()) {
+		dbgLogger.error("Expected String list.");
+		if(success)
+			*success = false;
+	}
+
+	return strings;
+}
+
+IntVector getClassStats(const Variant& var, const String& key, bool* success = nullptr) {
+	return getIntList(var, key, 6, 0, success);
 }
 
 
@@ -234,6 +271,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_addCommand<GoCommand>();
 	_addCommand<MoveCommand>();
 	_addCommand<AttackCommand>();
+	_addCommand<UseCommand>();
 }
 
 
@@ -329,6 +367,14 @@ CharacterSP TextMoba::player() {
 }
 
 
+SkillModelSP TextMoba::skillModel(const lair::String id) {
+	auto it = _skillModels.find(id);
+	if(it == _skillModels.end())
+		return nullptr;
+	return it->second;
+}
+
+
 CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
                                      MapNodeSP node) {
 	CharacterClassSP cc = characterClass(className);
@@ -339,6 +385,16 @@ CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
 
 	CharacterSP character = std::make_shared<Character>(this, cc, _charIndex);
 	character->_team = team;
+
+	for(const String& skillName: cc->skills()) {
+		SkillModelSP sm = skillModel(skillName);
+		if(sm) {
+			character->addSkill(sm, 1);
+		}
+		else {
+			dbgLogger.warning("Skill model not found: \"", skillName, "\"");
+		}
+	}
 
 	if(node) {
 		moveCharacter(character, node);
@@ -444,10 +500,10 @@ void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 
 
 void TextMoba::placeCharacter(CharacterSP character, Place place) {
-//	if(player() && character != player() && player()->isAlive()
-//	        && character->node() == player()->node()) {
-	    print(character->name(), " moves to the ", placeName(place), " row.");
-//	}
+	if(player() && player()->isAlive()
+	        && character->node() == player()->node()) {
+		print(character->name(), " moves to the ", placeName(place), " row.");
+	}
 	character->_place = place;
 }
 
@@ -474,6 +530,13 @@ void TextMoba::dealDamage(CharacterSP target, unsigned damage, CharacterSP attac
 	}
 	else {
 		target->_hp -= damage;
+	}
+}
+
+
+void TextMoba::healCharacter(CharacterSP target, unsigned amount, CharacterSP /*healer*/) {
+	if(target->isAlive()) {
+		target->_hp = std::min(target->hp() + amount, target->maxHP());
 	}
 }
 
@@ -513,6 +576,11 @@ void TextMoba::nextTurn() {
 	_turn += 1;
 
 	for(CharacterSP c: _characters) {
+		for(SkillSP skill: c->skills()) {
+			if(skill->timeBeforeNextUse() != 0)
+				skill->_timeBeforeNextUse -= 1;
+		}
+
 		if(c->ai()) {
 			c->ai()->play();
 		}
@@ -523,6 +591,11 @@ void TextMoba::nextTurn() {
 		_console->writeLine("A new batch of redshirts leave the fonxus.");
 		spawnRedshirts(_redshirtPerLane);
 		_nextWaveCounter = _waveTime;
+	}
+
+	for(SkillSP skill: player()->skills()) {
+		if(skill->timeBeforeNextUse() != 0)
+			skill->_timeBeforeNextUse -= 1;
 	}
 
 	_console->writeLine(cat("End of turn ", _turn));
@@ -626,7 +699,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	_redshirtXpWorth = getClassStats(config, "redshirt_xp_worth");
 	_towerXpWorth    = getClassStats(config, "tower_xp_worth");
 
-	Variant nodes = config.get("nodes");
+	const Variant& nodes = config.get("nodes");
 	if(nodes.isVarMap()) {
 		for(const auto& pair: nodes.asVarMap()) {
 			const String& id = pair.first;
@@ -666,7 +739,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		dbgLogger.error("Expected \"nodes\" VarMap.");
 	}
 
-	Variant paths = config.get("paths");
+	const Variant& paths = config.get("paths");
 	if(paths.isVarList()) {
 		for(const Variant& path: paths.asVarList()) {
 			const Variant& fromVar     = path.get("from");
@@ -704,7 +777,7 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		dbgLogger.error("Expected \"paths\" VarList.");
 	}
 
-	Variant classes = config.get("classes");
+	const Variant& classes = config.get("classes");
 	if(classes.isVarMap()) {
 		for(const auto& pair: classes.asVarMap()) {
 			const String& id = pair.first;
@@ -736,12 +809,86 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 			cClass->_maxMana   = getClassStats(obj, "max_mana");
 			cClass->_damage    = getClassStats(obj, "damage");
 			cClass->_range     = getClassStats(obj, "range");
+			cClass->_skills    = getStringList(obj, "skills");
 
 			_classes.emplace(cClass->id(), cClass);
 		}
 	}
 	else {
 		dbgLogger.error("Expected \"classes\" VarMap.");
+	}
+
+	const Variant& skills = config.get("skills");
+	if(skills.isVarMap()) {
+		for(const auto& pair: skills.asVarMap()) {
+			const String& id = pair.first;
+			const Variant& obj = pair.second;
+
+			SkillModelSP skill = std::make_shared<SkillModel>();
+
+			skill->_id        = id;
+			skill->_name      = getString(obj, "name", "<fixme_no_name>");
+			skill->_desc      = getString(obj, "desc");
+
+			const Variant& effectsVar = obj.get("effects");
+			if(effectsVar.isVarList()) {
+				for(const Variant& effectVar: effectsVar.asVarList()) {
+					SkillModel::Effect effect;
+
+					const Variant& typeVar = effectVar.get("type");
+					if(typeVar.isString())
+						effect._type = IntVector(2, parseSkillEffect(typeVar.asString()));
+					else if(typeVar.isVarList()){
+						const VarList& list = typeVar.asVarList();
+						if(list.size() == 2) {
+							for(const Variant& v: list) {
+								effect._type.push_back(parseSkillEffect(v.asString()));
+							}
+						}
+						else
+							dbgLogger.error("Skill effect type must be of size 2");
+					}
+					else
+						dbgLogger.error("Invalid skill effect type");
+
+					effect._power = getIntList(effectVar, "power", 2, 0);
+
+					skill->_effects.push_back(effect);
+				}
+			}
+			else
+				dbgLogger.error("Invalid skill effect");
+
+			const Variant& targetVar = obj.get("target");
+			skill->_target = IntVector(2, NO_TARGET);
+			if(targetVar.isString()) {
+				skill->_target = IntVector(2, parseSkillTarget(targetVar.asString()));
+			}
+			else if(targetVar.isVarList()) {
+				const VarList& list = targetVar.asVarList();
+				unsigned count = list.size();
+				if(count == 2) {
+					for(unsigned i = 0; i < count; ++i) {
+						skill->_target[i] = parseSkillTarget(list[i].asString());
+					}
+				}
+				else {
+					dbgLogger.error("Skill target array must contain exactly 2 values");
+				}
+			}
+			else {
+				dbgLogger.error("Invalid skill target.");
+			}
+
+			skill->_range    = getIntList(obj, "range", 2, 3);
+			skill->_cooldown = getIntList(obj, "cooldown", 2, 0);
+			skill->_manaCost = getIntList(obj, "mana_cost", 2, 99999);
+
+			_skillModels.emplace(skill->id(), skill);
+		}
+	}
+	else {
+		dbgLogger.error("Expected \"skills\" VarMap.");
 	}
 
 	// Setup

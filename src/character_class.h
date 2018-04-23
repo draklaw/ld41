@@ -37,10 +37,12 @@ public:
 
 	Place defaultPlace() const;
 
-	const IntVector maxHP() const;
-	const IntVector maxMana() const;
-	const IntVector damage() const;
-	const IntVector range() const;
+	const IntVector& maxHP() const;
+	const IntVector& maxMana() const;
+	const IntVector& damage() const;
+	const IntVector& range() const;
+
+	const StringVector& skills() const;
 
 	int maxHP(unsigned level) const;
 	int maxMana(unsigned level) const;
@@ -60,6 +62,8 @@ public:
 	IntVector    _damage;
 	IntVector    _range;
 	IntVector    _speed;
+
+	StringVector _skills;
 };
 
 

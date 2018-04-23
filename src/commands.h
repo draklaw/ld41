@@ -43,6 +43,7 @@ DECL_COMMAND(WaitCommand)
 DECL_COMMAND(GoCommand)
 DECL_COMMAND(MoveCommand)
 DECL_COMMAND(AttackCommand)
+DECL_COMMAND(UseCommand)
 
 
 #endif

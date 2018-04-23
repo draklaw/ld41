@@ -23,6 +23,7 @@
 
 #include "map_node.h"
 #include "character_class.h"
+#include "skill.h"
 
 #include "character.h"
 
@@ -179,6 +180,26 @@ bool Character::deathTime() const {
 }
 
 
+const SkillVector& Character::skills() {
+	return _skills;
+}
+
+
+SkillSP Character::skill(const String& name) {
+	for(SkillSP skill: _skills) {
+		if(skill->name() == name)
+			return skill;
+	}
+	return nullptr;
+}
+
+
+void Character::addSkill(SkillModelSP model, unsigned level) {
+	SkillSP skill = std::make_shared<Skill>(model, level, shared_from_this());
+	_skills.emplace_back(skill);
+}
+
+
 AiSP Character::ai() const {
 	return _ai;
 }
@@ -206,4 +227,9 @@ void Character::attack(CharacterSP target) {
 
 void Character::takeDamage(unsigned damage, CharacterSP attacker) {
 	_textMoba->dealDamage(shared_from_this(), damage, attacker);
+}
+
+
+void Character::heal(unsigned amount, CharacterSP healer) {
+	_textMoba->healCharacter(shared_from_this(), amount, healer);
 }

@@ -64,6 +64,8 @@ enum CharType {
 class MapNode;
 class CharacterClass;
 class Character;
+class SkillModel;
+class Skill;
 class Ai;
 class TMCommand;
 class TextMoba;
@@ -74,6 +76,8 @@ typedef std::shared_ptr<CharacterClass>  CharacterClassSP;
 typedef std::shared_ptr<Character>       CharacterSP;
 typedef std::shared_ptr<const Character> CharacterCSP;
 typedef std::weak_ptr<Character>         CharacterWP;
+typedef std::shared_ptr<SkillModel>      SkillModelSP;
+typedef std::shared_ptr<Skill>           SkillSP;
 typedef std::shared_ptr<Ai>              AiSP;
 typedef std::shared_ptr<TMCommand>       TMCommandSP;
 
@@ -88,6 +92,8 @@ struct CharacterOrder {
 
 typedef std::vector<CharacterSP> CharacterVector;
 typedef std::set<CharacterSP, CharacterOrder> CharacterSet;
+
+typedef std::vector<SkillSP> SkillVector;
 
 
 const lair::String& teamName(Team team);
@@ -125,6 +131,7 @@ public:
 	MapNodeSP fonxus(Team team);
 	CharacterClassSP characterClass(const lair::String& id);
 	CharacterSP player();
+	SkillModelSP skillModel(const lair::String id);
 
 	CharacterSP spawnCharacter(const lair::String& className, Team team,
 	                           MapNodeSP node = MapNodeSP());
@@ -139,6 +146,8 @@ public:
 	void attack(CharacterSP attacker, CharacterSP target);
 	void dealDamage(CharacterSP target, unsigned damage,
 	                CharacterSP attacker = nullptr);
+	void healCharacter(CharacterSP target, unsigned amount,
+	                   CharacterSP healer = nullptr);
 
 	void grantXp(CharacterSP character, unsigned xp);
 
@@ -165,6 +174,7 @@ private:
 	typedef std::unordered_map<lair::String, MapNodeSP>        NodeMap;
 	typedef std::unordered_map<lair::String, TMCommand*>       TMCommandMap;
 	typedef std::unordered_map<lair::String, CharacterClassSP> ClassMap;
+	typedef std::unordered_map<lair::String, SkillModelSP>     SkillModelMap;
 
 private:
 	void _initialize(std::istream& in, const lair::Path& logicPath);
@@ -176,8 +186,9 @@ private:
 	TMCommandList _commands;
 	TMCommandMap  _commandMap;
 
-	NodeMap      _nodes;
-	ClassMap     _classes;
+	NodeMap       _nodes;
+	ClassMap      _classes;
+	SkillModelMap _skillModels;
 
 	unsigned     _charIndex;
 	CharacterSet _characters;

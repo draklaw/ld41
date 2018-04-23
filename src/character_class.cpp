@@ -55,23 +55,28 @@ Place CharacterClass::defaultPlace() const {
 }
 
 
-const IntVector CharacterClass::maxHP() const {
+const IntVector& CharacterClass::maxHP() const {
 	return _maxHP;
 }
 
 
-const IntVector CharacterClass::maxMana() const {
+const IntVector& CharacterClass::maxMana() const {
 	return _maxMana;
 }
 
 
-const IntVector CharacterClass::damage() const {
+const IntVector& CharacterClass::damage() const {
 	return _damage;
 }
 
 
-const IntVector CharacterClass::range() const {
+const IntVector& CharacterClass::range() const {
 	return _range;
+}
+
+
+const StringVector& CharacterClass::skills() const {
+	return _skills;
 }
 
 

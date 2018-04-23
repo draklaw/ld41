@@ -36,6 +36,7 @@ add_executable(${CMAKE_PROJECT_NAME}
 	map_node.cpp
 	character_class.cpp
 	character.cpp
+	skill.cpp
 	ai.cpp
 	redshirt_ai.cpp
 	tower_ai.cpp
