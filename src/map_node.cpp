@@ -169,12 +169,10 @@ CharacterSP CharacterGroups::pickClosestEnemy(CharacterSP c, int range) const {
 	}
 
 	if(count(enemy, FRONT)) {
-		if(range > 0 && range == FRONT) {
+		if(range > 0) {
 			return pick(enemy, FRONT);
 		}
-		else {
-			range -= 1;
-		}
+		range -= 1;
 	}
 
 	if(range > 0 && count(enemy, BACK)) {
@@ -187,6 +185,23 @@ CharacterSP CharacterGroups::pickClosestEnemy(CharacterSP c, int range) const {
 
 unsigned CharacterGroups::_index(unsigned team, unsigned place) const {
 	return _indices[2 * team + place];
+}
+
+
+void CharacterGroups::dump() const {
+	dbgLogger.debug("Group:");
+	dbgLogger.debug("  Blue Back:");
+	for(unsigned i = 0; i < count(BLUE, BACK); ++i)
+		dbgLogger.debug("    ", get(BLUE, BACK, i)->debugName());
+	dbgLogger.debug("  Blue Front:");
+	for(unsigned i = 0; i < count(BLUE, FRONT); ++i)
+		dbgLogger.debug("    ", get(BLUE, FRONT, i)->debugName());
+	dbgLogger.debug("  Red Front:");
+	for(unsigned i = 0; i < count(RED, FRONT); ++i)
+		dbgLogger.debug("    ", get(RED, FRONT, i)->debugName());
+	dbgLogger.debug("  Red Back:");
+	for(unsigned i = 0; i < count(RED, BACK); ++i)
+		dbgLogger.debug("    ", get(RED, BACK, i)->debugName());
 }
 
 
