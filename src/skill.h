@@ -49,6 +49,7 @@ enum SkillTarget {
 	BACK_ROW,
 	ANY_ROW,
 	BOTH_ROWS,
+	HEROES
 };
 
 

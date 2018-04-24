@@ -253,8 +253,14 @@ CharacterVector Skill::targets(Place place) const {
 				chars.push_back(t);
 			}
 		}
-	}
-	else {
+	} else if (target() == HEROES) {
+		for(unsigned i = 0; i < groups.count(team); ++i) {
+			CharacterSP t = groups.get(team, i);
+			if(groups.distanceBetween(c, t) <= range() && t->type() == HERO) {
+				chars.push_back(t);
+			}
+		}
+	} else {
 		dbgLogger.error("Invalid Skill::target(Place) call");
 	}
 
@@ -330,6 +336,8 @@ SkillTarget parseSkillTarget(const lair::String& str) {
 		return ANY_ROW;
 	else if(str == "both_rows")
 		return BOTH_ROWS;
+	else if(str == "heroes")
+		return HEROES;
 	dbgLogger.error("Unknown skill target \"", str, "\"");
 	return NO_TARGET;
 }

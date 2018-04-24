@@ -164,7 +164,7 @@ skills = {
 				power = 50
 			}
 		]
-		target    = both_rows
+		target    = heroes
 		range     = 3
 		cooldown  = 0
 		mana_cost = 0

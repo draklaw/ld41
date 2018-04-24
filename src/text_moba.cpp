@@ -694,7 +694,7 @@ void TextMoba::nextTurn(CharacterSP character) {
 	// Fonxus regen
 	if(character->type() == BUILDING) {
 		for(SkillSP s: character->skills()) {
-			s->use();
+			s->use(character->place());
 		}
 	}
 
