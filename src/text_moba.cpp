@@ -498,6 +498,7 @@ void TextMoba::killCharacter(CharacterSP character, CharacterSP attacker) {
 void TextMoba::moveCharacter(CharacterSP character, MapNodeSP dest) {
 	if(player() && character != player() && player()->isAlive()
 	        && character->type() != BUILDING
+	        && character->isAlive()
 	        && character->node() == player()->node()) {
 		print(character->name(), " leaves the area.");
 	}
