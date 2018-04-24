@@ -231,6 +231,14 @@ CharacterVector Skill::targets() const {
 			}
 		}
 		break;
+	case HEROES:
+		for(unsigned i = 0; i < groups.count(team); ++i) {
+			CharacterSP t = groups.get(team, i);
+			if(groups.distanceBetween(c, t) <= range() && t->type() == HERO) {
+				chars.push_back(t);
+			}
+		}
+		break;
 	}
 
 	return chars;
@@ -253,14 +261,8 @@ CharacterVector Skill::targets(Place place) const {
 				chars.push_back(t);
 			}
 		}
-	} else if (target() == HEROES) {
-		for(unsigned i = 0; i < groups.count(team); ++i) {
-			CharacterSP t = groups.get(team, i);
-			if(groups.distanceBetween(c, t) <= range() && t->type() == HERO) {
-				chars.push_back(t);
-			}
-		}
-	} else {
+	}
+	else {
 		dbgLogger.error("Invalid Skill::target(Place) call");
 	}
 

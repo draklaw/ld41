@@ -658,6 +658,16 @@ void TextMoba::grantXp(CharacterSP character, unsigned xp) {
 		character->_hp   = character->maxHP()   * hpRatio;
 		character->_mana = character->maxMana() * manaRatio;
 
+		unsigned skillIndex = character->_level % 3;
+		if(skillIndex < character->skills().size()) {
+			SkillSP skill = character->_skills[skillIndex];
+			skill->_level += 1;
+
+			if(character == player()) {
+				print("Your skill \"", skill->name(), "\" reaches level ", skill->level());
+			}
+		}
+
 		if(nextLevel(character) == 0)
 			character->_xp = 0;
 	}
@@ -734,7 +744,7 @@ void TextMoba::nextTurn(CharacterSP character) {
 	// Fonxus regen
 	if(character->type() == BUILDING) {
 		for(SkillSP s: character->skills()) {
-			s->use(character->place());
+			s->use();
 		}
 	}
 
