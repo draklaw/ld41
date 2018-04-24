@@ -266,6 +266,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_console->setExecCommand(std::bind(&TextMoba::_execCommand, this, _1, false));
 
 	_addCommand<HelpCommand>();
+	_addCommand<InfoCommand>();
 	_addCommand<LookCommand>();
 	_addCommand<DirectionsCommand>();
 	_addCommand<WaitCommand>();
@@ -379,6 +380,19 @@ SkillModelSP TextMoba::skillModel(const lair::String id) {
 	if(it == _skillModels.end())
 		return nullptr;
 	return it->second;
+}
+
+
+const StringMap& TextMoba::infos() const {
+	return _infoTopics;
+}
+
+
+const lair::String* TextMoba::infos(const String& topic) {
+	auto it = _infoTopics.find(topic);
+	if(it == _infoTopics.end())
+		return nullptr;
+	return &it->second;
 }
 
 
@@ -1152,6 +1166,14 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	}
 	else {
 		dbgLogger.error("Expected \"skills\" VarMap.");
+	}
+
+
+	const Variant& infoVar = config.get("info");
+	if(infoVar.isVarMap()) {
+		for(const auto& pair: infoVar.asVarMap()) {
+			_infoTopics.emplace(pair.first, pair.second.asString());
+		}
 	}
 
 	// Setup

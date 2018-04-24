@@ -92,6 +92,37 @@ bool HelpCommand::exec(const StringVector& /*args*/) {
 
 
 
+InfoCommand::InfoCommand(TextMoba* textMoba)
+    : TMCommand(textMoba)
+{
+	_names.emplace_back("info");
+	_names.emplace_back("i");
+
+	_desc = "  Information about game mechanics.";
+}
+
+bool InfoCommand::exec(const StringVector& args) {
+	if(args.size() != 2) {
+		print("Available topic (use \"", args[0], "\" <topic>\":");
+		for(const auto& pair: tm()->infos()) {
+			print("  ", pair.first);
+		}
+	}
+	else {
+		const String* info = tm()->infos(args[1]);
+		if(info) {
+			print(*info);
+		}
+		else {
+			print("Unknown topic \"", args[1], "\".");
+		}
+	}
+
+	return true;
+}
+
+
+
 LookCommand::LookCommand(TextMoba* textMoba)
     : TMCommand(textMoba)
 {

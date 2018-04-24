@@ -85,6 +85,8 @@ typedef std::shared_ptr<TMCommand>       TMCommandSP;
 typedef std::vector<int>          IntVector;
 typedef std::vector<lair::String> StringVector;
 
+typedef std::unordered_map<lair::String, lair::String> StringMap;
+
 
 struct CharacterOrder {
 	bool operator()(const CharacterSP& c0, const CharacterSP& c1) const;
@@ -133,6 +135,9 @@ public:
 	const CharacterSet& characters() const;
 	CharacterSP player();
 	SkillModelSP skillModel(const lair::String id);
+
+	const StringMap& infos() const;
+	const lair::String* infos(const lair::String& topic);
 
 	CharacterSP spawnCharacter(const lair::String& className, Team team,
 	                           MapNodeSP node = MapNodeSP());
@@ -222,6 +227,8 @@ public:
 	unsigned _nextWaveCounter;
 
 	CharacterVector _heroes;
+
+	StringMap _infoTopics;
 };
 
 

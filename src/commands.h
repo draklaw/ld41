@@ -37,6 +37,7 @@
 
 
 DECL_COMMAND(HelpCommand)
+DECL_COMMAND(InfoCommand)
 DECL_COMMAND(LookCommand)
 DECL_COMMAND(DirectionsCommand)
 DECL_COMMAND(WaitCommand)

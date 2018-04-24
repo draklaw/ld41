@@ -510,3 +510,15 @@ paths = [
 		to_dirs   = [ "red", "ahead" ]
 	}
 ]
+
+
+info = {
+	rows = """Each node is composed of four rows: two for the blue (back and front) and two for the red (back and front too). The rows are placed like this:
+  blue-back  |  blue-front  |  red-front  | red-back
+
+To attack an enemy, he must be in range. Mage and ranger have a range of 2, the warrior has a range of 1. This mean that the warrior can only attack enemies that are close to him. The trick is that empty lanes don't count for the range.
+
+Example 1: you are in the row blue-back and the enemy is in red-back, and there is nobody in front rows, you are at a range of 1.
+
+Example 2: you attack a tower in the back row, with blueshirts in the front row. There is no enemy in the front row and the tower is on the back row (as always). The tower is at range 2."""
+}
