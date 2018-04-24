@@ -63,4 +63,7 @@ void TowerAi::play() {
 
 		_target = target;
 	}
+	else {
+		_target.reset();
+	}
 }
