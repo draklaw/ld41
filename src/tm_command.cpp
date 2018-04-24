@@ -27,8 +27,9 @@
 using namespace lair;
 
 
-TMCommand::TMCommand(TextMoba* textMoba)
+TMCommand::TMCommand(TextMoba* textMoba, bool hidden)
     : _textMoba(textMoba)
+    , _hidden(hidden)
 {
 }
 

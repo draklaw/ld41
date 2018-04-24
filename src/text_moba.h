@@ -85,6 +85,8 @@ typedef std::shared_ptr<TMCommand>       TMCommandSP;
 typedef std::vector<int>          IntVector;
 typedef std::vector<lair::String> StringVector;
 
+typedef std::unordered_map<lair::String, lair::String> StringMap;
+
 
 struct CharacterOrder {
 	bool operator()(const CharacterSP& c0, const CharacterSP& c1) const;
@@ -134,6 +136,9 @@ public:
 	CharacterSP player();
 	SkillModelSP skillModel(const lair::String id);
 
+	const StringMap& infos() const;
+	const lair::String* infos(const lair::String& topic);
+
 	CharacterSP spawnCharacter(const lair::String& className, Team team,
 	                           MapNodeSP node = MapNodeSP());
 	CharacterSP spawnRedshirt(Team team, Lane lane);
@@ -158,6 +163,9 @@ public:
 	void nextTurn();
 	void nextTurn(CharacterSP character);
 
+	void restart(const lair::String& className);
+	void gameOver(bool win);
+
 	const TMCommandList& commands() const;
 	TMCommand* command(const lair::String& name) const;
 
@@ -168,7 +176,8 @@ public:
 		_addCommand(std::make_shared<Cmd>(this));
 	}
 
-	bool _execCommand(const lair::String& command);
+	bool execCommand(const lair::String& command);
+	bool _execCommand(const lair::String& command, bool internal = false);
 
 	template<typename... Args>
 	inline void print(Args&&... args) {
@@ -190,6 +199,7 @@ private:
 
 	TMCommandList _commands;
 	TMCommandMap  _commandMap;
+	TMCommand*    _currentCommand;
 
 	NodeMap       _nodes;
 	ClassMap      _classes;
@@ -198,6 +208,8 @@ private:
 	unsigned     _charIndex;
 	CharacterSet _characters;
 	CharacterSP  _player;
+	CharacterSP  _blueFonxus;
+	CharacterSP  _redFonxus;
 
 public:
 	unsigned _firstWaveTime;
@@ -209,10 +221,14 @@ public:
 	IntVector _redshirtXpWorth;
 	IntVector _towerXpWorth;
 
+	IntVector _respawnTime;
+
 	unsigned _turn;
 	unsigned _nextWaveCounter;
 
 	CharacterVector _heroes;
+
+	StringMap _infoTopics;
 };
 
 

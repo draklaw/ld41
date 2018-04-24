@@ -259,12 +259,14 @@ Place placeFromPlaceIndex(unsigned pi) {
 TextMoba::TextMoba(MainState* mainState, Console* console)
     : _mainState(mainState)
     , _console(console)
+    , _currentCommand(nullptr)
 {
 	using namespace std::placeholders;
 
-	_console->setExecCommand(std::bind(&TextMoba::_execCommand, this, _1));
+	_console->setExecCommand(std::bind(&TextMoba::_execCommand, this, _1, false));
 
 	_addCommand<HelpCommand>();
+	_addCommand<InfoCommand>();
 	_addCommand<LookCommand>();
 	_addCommand<DirectionsCommand>();
 	_addCommand<WaitCommand>();
@@ -272,6 +274,7 @@ TextMoba::TextMoba(MainState* mainState, Console* console)
 	_addCommand<MoveCommand>();
 	_addCommand<AttackCommand>();
 	_addCommand<UseCommand>();
+	_addCommand<RestartCommand>();
 }
 
 
@@ -380,6 +383,19 @@ SkillModelSP TextMoba::skillModel(const lair::String id) {
 }
 
 
+const StringMap& TextMoba::infos() const {
+	return _infoTopics;
+}
+
+
+const lair::String* TextMoba::infos(const String& topic) {
+	auto it = _infoTopics.find(topic);
+	if(it == _infoTopics.end())
+		return nullptr;
+	return &it->second;
+}
+
+
 CharacterSP TextMoba::spawnCharacter(const lair::String& className, Team team,
                                      MapNodeSP node) {
 	CharacterClassSP cc = characterClass(className);
@@ -463,13 +479,16 @@ void TextMoba::killCharacter(CharacterSP character, CharacterSP attacker) {
 
 	if(character->type() == HERO) {
 		moveCharacter(character, fonxus(character->team()));
-		// TODO: Death & respawn
-		character->_hp = character->maxHP();
+
+		moveCharacter(character, nullptr);
+		// +1 because it will be decremented almost instantly.
+		character->_deathTime = _respawnTime[character->_level] + 1;
+		dbgLogger.error(character->debugName(), " death time ", character->deathTime());
 	}
 	else {
 		if(character->node()) {
 			character->node()->removeCharacter(character);
-			character->_node = nullptr;
+			moveCharacter(character, nullptr);
 		}
 		_characters.erase(character);
 	}
@@ -682,15 +701,36 @@ void TextMoba::nextTurn() {
 	if(_nextWaveCounter == 0)
 		_nextWaveCounter = _waveTime;
 
+	// Win-condition
+	if(!_redFonxus->isAlive()) {
+		gameOver(true);
+		return;
+	}
+	if(!_blueFonxus->isAlive()) {
+		gameOver(false);
+		return;
+	}
+
 	// Player turn
 	nextTurn(player());
 
 	_console->writeLine(cat("End of turn ", _turn));
-	_execCommand("look");
+	execCommand("look");
 }
 
 
 void TextMoba::nextTurn(CharacterSP character) {
+	if(character->deathTime()) {
+		character->_deathTime -= 1;
+		dbgLogger.warning(character->debugName(), " death time: ", character->deathTime());
+		if(character->deathTime() == 0) {
+			character->_hp   = character->maxHP();
+			character->_mana = character->maxMana();
+			moveCharacter(character, fonxus(character->team()));
+		}
+		return;
+	}
+
 	// Fonxus regen
 	if(character->type() == BUILDING) {
 		for(SkillSP s: character->skills()) {
@@ -741,6 +781,84 @@ void TextMoba::nextTurn(CharacterSP character) {
 }
 
 
+void TextMoba::restart(const lair::String& className) {
+	_turn = 0;
+	_nextWaveCounter = _firstWaveTime;
+
+	for(const auto& pair: _nodes) {
+		pair.second->_characters.clear();
+	}
+	_characters.clear();
+	_heroes.clear();
+
+	// Player *must* have charIndex 0
+	_charIndex = 0;
+	_player = spawnCharacter(className, BLUE, mapNode("bf"));
+	_heroes.push_back(_player);
+
+	if(className != "ranger")
+		_heroes.push_back(spawnCharacter("ranger", BLUE, mapNode("bf")));
+	if(className != "warrior")
+		_heroes.push_back(spawnCharacter("warrior", BLUE, mapNode("bf")));
+	if(className != "mage")
+		_heroes.push_back(spawnCharacter("mage", BLUE, mapNode("bf")));
+
+	_heroes.push_back(spawnCharacter("ranger", RED, mapNode("rf")));
+	_heroes.push_back(spawnCharacter("warrior", RED, mapNode("rf")));
+	_heroes.push_back(spawnCharacter("mage", RED, mapNode("rf")));
+
+	for(unsigned i = 1; i < _heroes.size(); ++i) {
+		CharacterSP c = _heroes[i];
+		c->setAi<HeroAi>((c->className() == "ranger")? TOP: BOT);
+	}
+
+	for(const auto& pair: _nodes) {
+		MapNodeSP node = pair.second;
+
+		if(node->fonxus().size()) {
+			Team team = (node->fonxus() == "blue")? BLUE: RED;
+			CharacterSP fonxus = spawnCharacter("fonxus", team, node);
+			if(team == BLUE)
+				_blueFonxus = fonxus;
+			else
+				_redFonxus = fonxus;
+		}
+		if(node->tower().size()) {
+			CharacterSP tower = spawnCharacter("tower", (node->tower() == "blue")? BLUE: RED, node);
+			tower->setAi<TowerAi>();
+		}
+	}
+
+	// Starts the game with a description of the environement
+	execCommand("look");
+}
+
+
+void TextMoba::gameOver(bool win) {
+	print("");
+	if(win) {
+		print("CONGRATULATION ! You destroyed the enemy Fonxus.");
+	}
+	else {
+		print("Sorry... The enemy destroyed your Fonxus. Try again !");
+	}
+
+	print("");
+	print("  Thanks for playing League of Adventure !");
+	print("");
+	print("  This game was made for the Ludum Dare 41.");
+	print("    \"Combine 2 Incompatible Genres\"");
+	print("");
+	print("  Authors:");
+	print("    Noémie-Fleur 'Alia' Sandillon-Rezer");
+	print("                 'Dr Windu'");
+	print("           Simon 'Draklaw' Boyé");
+	print("          Marion 'Panda'");
+
+	_execCommand("restart");
+}
+
+
 const TextMoba::TMCommandList& TextMoba::commands() const {
 	return _commands;
 }
@@ -764,8 +882,15 @@ void TextMoba::_addCommand(TMCommandSP command) {
 }
 
 
-bool TextMoba::_execCommand(const String& command) {
-	dbgLogger.log("Exec: ", command);
+bool TextMoba::execCommand(const lair::String& command) {
+	return _execCommand(command, true);
+}
+
+
+bool TextMoba::_execCommand(const String& command, bool internal) {
+	if(!internal) {
+		dbgLogger.log("Exec: ", command);
+	}
 
 	StringVector args;
 
@@ -789,13 +914,21 @@ bool TextMoba::_execCommand(const String& command) {
 	if(args.empty())
 		return false;
 
-	TMCommand* tmCommand = this->command(args[0]);
+	TMCommand* tmCommand = (!internal && _currentCommand)?
+	                           _currentCommand:
+	                           this->command(args[0]);
 
 	if(!tmCommand) {
 		console()->writeLine(cat("Command \"", args[0], "\" do not exists. Type \"h\" for help."));
 	}
-	else {
+	else if(internal) {
 		tmCommand->exec(args);
+	}
+	else {
+		_currentCommand = tmCommand;
+		if(tmCommand->exec(args)) {
+			_currentCommand = nullptr;
+		}
 	}
 
 	return true;
@@ -836,6 +969,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	_heroXpWorth     = getClassStats(config, "hero_xp_worth");
 	_redshirtXpWorth = getClassStats(config, "redshirt_xp_worth");
 	_towerXpWorth    = getClassStats(config, "tower_xp_worth");
+
+	_respawnTime = getClassStats(config, "respawn_time");
 
 	const Variant& nodes = config.get("nodes");
 	if(nodes.isVarMap()) {
@@ -1033,40 +1168,14 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		dbgLogger.error("Expected \"skills\" VarMap.");
 	}
 
+
+	const Variant& infoVar = config.get("info");
+	if(infoVar.isVarMap()) {
+		for(const auto& pair: infoVar.asVarMap()) {
+			_infoTopics.emplace(pair.first, pair.second.asString());
+		}
+	}
+
 	// Setup
-
-	_turn = 0;
-	_nextWaveCounter = _firstWaveTime;
-
-	// Player *must* have charIndex 0
-	_charIndex = 0;
-	_player = spawnCharacter("ranger", BLUE, mapNode("bf"));
-	_heroes.push_back(_player);
-
-	_heroes.push_back(spawnCharacter("warrior", BLUE, mapNode("bf")));
-	_heroes.push_back(spawnCharacter("mage", BLUE, mapNode("bf")));
-
-	_heroes.push_back(spawnCharacter("ranger", RED, mapNode("rf")));
-	_heroes.push_back(spawnCharacter("warrior", RED, mapNode("rf")));
-	_heroes.push_back(spawnCharacter("mage", RED, mapNode("rf")));
-
-	for(unsigned i = 1; i < _heroes.size(); ++i) {
-		CharacterSP c = _heroes[i];
-		c->setAi<HeroAi>((c->className() == "ranger")? TOP: BOT);
-	}
-
-	for(const auto& pair: _nodes) {
-		MapNodeSP node = pair.second;
-
-		if(node->fonxus().size()) {
-			spawnCharacter("fonxus", (node->fonxus() == "blue")? BLUE: RED, node);
-		}
-		if(node->tower().size()) {
-			CharacterSP tower = spawnCharacter("tower", (node->tower() == "blue")? BLUE: RED, node);
-			tower->setAi<TowerAi>();
-		}
-	}
-
-	// Starts the game with a description of the environement
-	_execCommand("look");
+	_execCommand("restart");
 }

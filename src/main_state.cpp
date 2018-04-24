@@ -419,10 +419,16 @@ void MainState::updateTick() {
 }
 
 
+String hpDesc(CharacterSP c) {
+	if(c->isAlive())
+		return cat(std::setw(6), c->hp(), " / ", c->maxHP());
+	return cat("  DEAD (", c->deathTime(), "t)");
+}
+
 String skillDesc(CharacterSP c) {
 	std::ostringstream out;
 	for(SkillSP skill: c->skills()) {
-		out << skill->name() << ": " << skill->manaCost() << " mp";
+		out << skill->name() << " " << skill->manaCost() << "mp";
 		if(skill->timeBeforeNextUse())
 			out << " (" << skill->timeBeforeNextUse() << "t)";
 		out << "\n";
@@ -437,7 +443,7 @@ String alliesDesc(const CharacterSet& chars) {
 			continue;
 
 		out << c->className() << " lvl " << c->level() + 1 << "\n"
-		    << " hp:" << std::setw(6) << c->hp() << " / " << c->maxHP() << "\n"
+		    << " hp:" << hpDesc(c) << "\n"
 		    << " mana:" << std::setw(4) << c->mana() << " / " << c->maxMana() << "\n";
 	}
 	return out.str();
@@ -464,17 +470,20 @@ void MainState::updateFrame() {
 	}
 
 	CharacterSP player = _textMoba.player();
-	String stats = cat(
-	    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
-	    " hp:", std::setw(6), player->hp(),   " / ", player->maxHP(), "\n",
-	    " mana:", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
-	    " xp:", std::setw(6), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
-	    "\n",
-	    "Skills:\n",
-	    skillDesc(player),
-	    "\n",
-	    alliesDesc(_textMoba.characters())
-	);
+	String stats;
+	if(player) {
+		stats = cat(
+		    "lvl ", player->level() + 1, " ", player->teamName(), " ", player->className(), "\n",
+		    " hp:", hpDesc(player), "\n",
+		    " mana:", std::setw(4), player->mana(), " / ", player->maxMana(), "\n",
+		    " xp:", std::setw(6), player->xp(),   " / ", _textMoba.nextLevel(player), "\n",
+		    "\n",
+		    "Skills:\n",
+		    skillDesc(player),
+		    "\n",
+		    alliesDesc(_textMoba.characters())
+		);
+	}
 	BitmapTextComponent* statsText = _texts.get(_statsText);
 	if(statsText) {
 		statsText->setText(stats);
@@ -482,15 +491,15 @@ void MainState::updateFrame() {
 
 
 	SpriteComponent* view = _sprites.get(_view);
-	view->setEnabled(player->isAlive());
-	if(player->isAlive()) {
+	view->setEnabled(player && player->isAlive());
+	if(player && player->isAlive()) {
 		view->setTexture(player->node()->image());
 	}
 
 	while(_view.firstChild().isValid()) {
 		_view.firstChild().destroy();
 	}
-	if(player->isAlive() && player->node()) {
+	if(player && player->isAlive() && player->node()) {
 		CharacterVector viewChars;
 		for(CharacterSP c: player->node()->characters()) {
 			if(c->team() == RED && c->type() != BUILDING) {
@@ -507,7 +516,7 @@ void MainState::updateFrame() {
 			}
 
 			EntityRef e = _entities.cloneEntity(_charModel, _view);
-			e.placeAt(Vector2(x, 50));
+			e.placeAt(Vector2(x, (c->place() == BACK)? 60: 30));
 			index += 1;
 
 			SpriteComponent* s = _sprites.get(e);
@@ -520,25 +529,28 @@ void MainState::updateFrame() {
 	while(_map.firstChild().isValid()) {
 		_map.firstChild().destroy();
 	}
-	for(CharacterSP c: _textMoba.characters()) {
-		addMapIcon(c);
-	}
 
-	const float offset = 16;
-	for(const auto& pair: _mapCharMap) {
-		const EntityVector& entities = pair.second;
+	if(player) {
+		for(CharacterSP c: _textMoba.characters()) {
+			addMapIcon(c);
+		}
 
-		if(entities.size() < 2)
-			continue;
+		const float offset = 16;
+		for(const auto& pair: _mapCharMap) {
+			const EntityVector& entities = pair.second;
 
-		int width = std::ceil(std::sqrt(entities.size()));
-		int height = (entities.size() - 1) / width + 1;
-		Vector2 base = entities[0].position2() - Vector2(width - 1, -height + 1) * offset / 2;
+			if(entities.size() < 2)
+				continue;
 
-		int i = 0;
-		for(EntityRef e: entities) {
-			e.placeAt(Vector2(base + Vector2(i % width, -i / width) * offset));
-			i += 1;
+			int width = std::ceil(std::sqrt(entities.size()));
+			int height = (entities.size() - 1) / width + 1;
+			Vector2 base = entities[0].position2() - Vector2(width - 1, -height + 1) * offset / 2;
+
+			int i = 0;
+			for(EntityRef e: entities) {
+				e.placeAt(Vector2(base + Vector2(i % width, -i / width) * offset));
+				i += 1;
+			}
 		}
 	}
 
@@ -551,6 +563,8 @@ void MainState::updateFrame() {
 	renderer()->uploadPendingTextures();
 	_spriteRenderer.finalizeShaders();
 
+	Vector4 clearColor = linearFromSrgb(Vector4(.1, .1, .1, 1));
+	glc->clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 	glc->clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
 	bool buffersFilled = false;

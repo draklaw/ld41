@@ -32,11 +32,12 @@
 	class _name : public TMCommand { \
 	public: \
 	    _name(TextMoba* textMoba); \
-	    virtual void exec(const StringVector& args) override; \
+	    virtual bool exec(const StringVector& args) override; \
 	};
 
 
 DECL_COMMAND(HelpCommand)
+DECL_COMMAND(InfoCommand)
 DECL_COMMAND(LookCommand)
 DECL_COMMAND(DirectionsCommand)
 DECL_COMMAND(WaitCommand)
@@ -45,5 +46,13 @@ DECL_COMMAND(MoveCommand)
 DECL_COMMAND(AttackCommand)
 DECL_COMMAND(UseCommand)
 
+class RestartCommand : public TMCommand {
+public:
+    RestartCommand(TextMoba* textMoba);
+    virtual bool exec(const StringVector& args) override;
+
+public:
+    bool _readClass;
+};
 
 #endif
