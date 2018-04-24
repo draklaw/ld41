@@ -57,9 +57,10 @@ void TowerAi::play() {
 		}
 
 		if(target) {
-			_target = target;
 //			dbgLogger.info("  Attack ", target->debugName());
 			c->attack(target);
 		}
+
+		_target = target;
 	}
 }
