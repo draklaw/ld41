@@ -61,7 +61,7 @@ First, we lacked time to implement everything. Heros should have had 3 skills in
 
 Second, 3 days are not enough to balance such a game. You can't really balance the game before all mechanics are implemented, and then you just don't have the time. Completing a game takes at least half an hour, so it is really hard to iterate the design.
 
-Last, but not least, I don't think people will invest enough time in a broken LD game to really grasp the mechanics. However the game is really not interesting if you don't care about placement, ranges and such. It is not _that_ interesting it its current state, mostly because of bugs, poor AI and missing featuers, but I think the base design works.
+Last, but not least, I don't think people will invest enough time in a broken LD game to really grasp the mechanics. But the game becomes interesting only if you don care about placement, ranges and such. It is not _that_ interesting it its current state, mostly because of bugs, poor AI and missing featuers, but I think the base design works.
 
 The good news is that I might keep working on it. It might lead to something interesting.
 
