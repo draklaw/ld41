@@ -24,6 +24,8 @@
 
 #include <lair/core/json.h>
 
+#include <lair/meta/variant_loader.h>
+
 #include "game.h"
 #include "splash_state.h"
 
@@ -414,7 +416,6 @@ void MainState::updateTick() {
 		quit();
 	}
 
-
 	_entities.updateWorldTransforms();
 }
 
@@ -554,7 +555,6 @@ void MainState::updateFrame() {
 		}
 	}
 
-
 	// Rendering
 	Context* glc = renderer()->context();
 
@@ -615,17 +615,10 @@ bool MainState::loadEntities(const Path& path, EntityRef parent, const Path& cd)
 	log().info("Load entity \"", localPath, "\"");
 
 	Path realPath = game()->dataPath() / localPath;
-	Path::IStream in(realPath.native().c_str());
-	if(!in.good()) {
-		log().error("Unable to read \"", localPath, "\".");
-		return false;
-	}
-	ErrorList errors;
-	LdlParser parser(&in, localPath.utf8String(), &errors, LdlParser::CTX_MAP);
 
-	bool success = _entities.loadEntitiesFromLdl(parser, parent);
-
-	errors.log(log());
-
-	return success;
+	LoaderSP varLoader = loader()->load<VariantLoader>(localPath);
+	varLoader->wait();
+	AssetSP asset = varLoader->asset();
+	VariantAspectSP aspect = asset->aspect<VariantAspect>();
+	return _entities.loadEntities(aspect->get(), parent);
 }

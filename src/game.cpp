@@ -19,7 +19,7 @@
  */
 
 
-#include <lair/core/property.h>
+#include <lair/meta/property.h>
 
 #include <lair/render_gl3/texture_set.h>
 
@@ -54,18 +54,13 @@ Game::Game(int argc, char** argv)
     : GameBase(argc, argv),
       _mainState(),
       _splashState() {
-	serializer().registerType<Shape2D>(
-	            static_cast<bool(*)(LdlParser&, Shape2D&)>(ldlRead),
-	            static_cast<bool(*)(LdlWriter&, const Shape2D&)>(ldlWrite));
-	serializer().registerType<Shape2DVector>(
-	            static_cast<bool(*)(LdlParser&, Shape2DVector&)>(ldlRead),
-	            static_cast<bool(*)(LdlWriter&, const Shape2DVector&)>(ldlWrite));
-
+	serializer().registerType<Shape2D>();
+	serializer().registerType<Shape2DVector>();
 	serializer().registerType<TextureSetCSP>(
-	    [this](LdlParser& parser, TextureSetCSP& ts) {
-		    return ldlRead(parser, ts, _renderer, _loader.get());
+	    [this](TextureSetCSP& value, const Variant& var, Logger& logger) {
+		    return varRead(value, var, _renderer, _loader.get(), logger);
 	    },
-	    static_cast<bool(*)(LdlWriter&, const TextureSetCSP&)>(ldlWrite)
+	    static_cast<bool(*)(Variant&, const TextureSetCSP&, Logger&)>(varWrite)
 	);
 }
 

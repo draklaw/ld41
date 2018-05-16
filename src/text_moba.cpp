@@ -21,6 +21,10 @@
 
 #include <lair/core/log.h>
 
+#include <lair/meta/var_list.h>
+#include <lair/meta/var_map.h>
+#include <lair/meta/variant_reader.h>
+
 #include "game.h"
 #include "main_state.h"
 #include "console.h"
@@ -965,6 +969,8 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 	}
 	errors.log(dbgLogger);
 
+	VariantReader reader;
+
 	// Read gameplay.ldl
 
 	Variant motd = config.get("motd");
@@ -972,9 +978,9 @@ void TextMoba::_initialize(std::istream& in, const lair::Path& logicPath) {
 		_console->writeLine(motd.asString());
 	}
 
-	_firstWaveTime   = getInt(config, "first_wave_time");
-	_waveTime        = getInt(config, "wave_time");
-	_redshirtPerLane = getInt(config, "redshirt_per_lane");
+	_redshirtPerLane = reader.read(config.get("redshirt_per_lane"), 2);
+	_firstWaveTime   = reader.read(config.get("first_wave_time"), 5);
+	_waveTime        = reader.read(config.get("wave_time"), 10);
 
 	_heroNextLevel   = getClassStats(config, "hero_next_level");
 	_heroXpWorth     = getClassStats(config, "hero_xp_worth");
