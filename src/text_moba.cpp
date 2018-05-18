@@ -25,6 +25,8 @@
 #include <lair/meta/var_map.h>
 #include <lair/meta/variant_reader.h>
 
+#include <lair/ldl/read.h>
+
 #include "game.h"
 #include "main_state.h"
 #include "console.h"

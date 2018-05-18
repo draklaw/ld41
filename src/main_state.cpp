@@ -22,9 +22,7 @@
 #include <functional>
 #include <iomanip>
 
-#include <lair/core/json.h>
-
-#include <lair/meta/variant_loader.h>
+#include <lair/ldl/ldl_variant_loader.h>
 
 #include "game.h"
 #include "splash_state.h"
@@ -616,7 +614,7 @@ bool MainState::loadEntities(const Path& path, EntityRef parent, const Path& cd)
 
 	Path realPath = game()->dataPath() / localPath;
 
-	LoaderSP varLoader = loader()->load<VariantLoader>(localPath);
+	LoaderSP varLoader = loader()->load<LdlVariantLoader>(localPath);
 	varLoader->wait();
 	AssetSP asset = varLoader->asset();
 	VariantAspectSP aspect = asset->aspect<VariantAspect>();

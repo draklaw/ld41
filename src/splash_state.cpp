@@ -21,8 +21,6 @@
 
 #include <functional>
 
-#include <lair/core/json.h>
-
 #include "game.h"
 #include "main_state.h"
 
